@@ -1,0 +1,1844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>Trustana — Nigeria's Freelance Escrow</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230D0D0F'/><polygon points='32,12 52,22 52,42 32,52 12,42 12,22' fill='%23F5A623'/></svg>"/>
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png"/>
+<link rel="shortcut icon" href="favicon.ico"/>
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png"/>
+<meta name="theme-color" content="#F5A623"/>
+<meta name="description" content="Nigeria's first AI-powered freelance escrow. Lock payments in Crypto or Fiat. SmartVerify AI checks delivery. Zero scams."/>
+<meta property="og:title" content="Trustana — Nigeria's Freelance Escrow"/>
+<meta property="og:description" content="Lock client funds before you write a single line of code. SmartVerify AI. Crypto + Fiat."/>
+<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@500;700&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<!-- Firebase Realtime Database SDK -->
+<script type="module">
+
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, set, get, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBk4s7bNG0a1CilEWVQ7JvGIxe_yt9l6Us",
+  authDomain: "trustanang.firebaseapp.com",
+  projectId: "trustanang",
+  storageBucket: "trustanang.firebasestorage.app",
+  messagingSenderId: "721544592051",
+  appId: "1:721544592051:web:de523365df60a4b1cdcec6",
+  measurementId: "G-23H9PY2SLH",
+  databaseURL: "https://trustanang-default-rtdb.firebaseio.com/"
+};
+
+window._fbReady = firebaseConfig.apiKey !== "YOUR_API_KEY";
+
+if (window._fbReady) {
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+
+  window._fbSet = async (path, data) => {
+    try { await set(ref(db, path), data); return true; }
+    catch(e) { console.warn('FB write failed:', e.message); return false; }
+  };
+
+  window._fbGet = async (path) => {
+    try {
+      const snap = await get(ref(db, path));
+      return snap.exists() ? snap.val() : null;
+    } catch(e) { console.warn('FB read failed:', e.message); return null; }
+  };
+
+  window._fbListen = (path, cb) => {
+    return onValue(ref(db, path), snap => cb(snap.exists() ? snap.val() : null));
+  };
+
+  console.log('Firebase ready - real-time sync ON');
+} else {
+  window._fbSet = async () => false;
+  window._fbGet = async () => null;
+  window._fbListen = () => () => {};
+  console.warn('Firebase not configured - localStorage only');
+}
+
+window._fbUnsubscribe = null;
+</script>
+</head>
+<body>
+
+<!-- LANDING PAGE -->
+<div class="screen active" id="s-land">
+
+  <!-- Full-page background canvas (covers everything except footer) -->
+  <canvas id="land-canvas"></canvas>
+
+  <!-- Nav -->
+  <nav class="land-nav">
+    <div class="land-logo"><div class="land-logo-mark"></div>TRUSTANA</div>
+    <div class="land-nav-btns">
+      <button class="btn btn-ghost" style="padding:7px 14px;font-size:.76rem;background:none;border:none;color:var(--stone2);cursor:pointer" onclick="goToAbout()">About</button>
+      <button class="btn btn-ghost" style="padding:7px 14px;font-size:.76rem;background:none;border:none;color:var(--stone2);cursor:pointer" onclick="goToContact()">Contact</button>
+      <button class="btn btn-g" style="padding:7px 14px;font-size:.76rem" onclick="goTo('s-waitlist')"> Waitlist</button>
+    </div>
+    <button class="land-hamburger" id="land-hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+
+  <!-- Mobile dropdown menu -->
+  <div class="land-mobile-menu" id="land-mobile-menu">
+    <button onclick="closeMobileMenu();goToHome()">Home</button>
+    <button onclick="closeMobileMenu();goToAbout()">About</button>
+    <button onclick="closeMobileMenu();goToContact()">Contact</button>
+    <button class="mmenu-waitlist" onclick="closeMobileMenu();goTo('s-waitlist')"> Join the Waitlist</button>
+  </div>
+
+
+  <!-- Spacer so fixed nav doesn't overlap hero -->
+  <div style="height:60px;flex-shrink:0"></div>
+
+
+
+  <!-- Hero -->
+  <div class="land-hero-wrap">
+
+    <!-- Mobile hero (hidden on desktop) -->
+    <div class="land-hero">
+      <div class="land-eyebrow reveal"><span class="land-eyebrow-dot"></span>🇳🇬 Nigeria's First AI-Powered Freelance Escrow</div>
+      <h1 class="land-h1 reveal reveal-delay-1">GET PAID.<br><em>NO SCAMS.</em><br>GUARANTEED.</h1>
+      <div class="land-hero-sub reveal reveal-delay-2">
+        <div class="hero-point"><span class="hero-point-ico"></span><span>Client funds locked <em>before</em> you start</span></div>
+        <div class="hero-point"><span class="hero-point-ico"></span><span>SmartVerify™ AI <em>checks</em> every delivery</span></div>
+        <div class="hero-point"><span class="hero-point-ico"></span><span>You get paid. <em>Period.</em></span></div>
+      </div>
+      <div class="land-hero-btns reveal reveal-delay-3">
+        <button class="btn btn-a" style="padding:12px 28px;font-size:.92rem" onclick="goTo('s-waitlist')">Join the Waitlist</button>
+      </div>
+      <div class="land-pills reveal reveal-delay-4">
+        <span class="land-pill">🇳🇬 Nigeria-first</span>
+        <span class="land-pill"> Crypto on-chain</span>
+        <span class="land-pill">✦ SmartVerify™ AI</span>
+        <span class="land-pill">₦ Fiat via Paystack</span>
+        <span class="land-pill"> WhatsApp alerts</span>
+        <span class="land-pill"> Dispute protection</span>
+      </div>
+
+
+
+      <!-- Powered by Solana badge -->
+      <div class="reveal reveal-delay-4" style="display:flex;justify-content:center;margin-top:14px">
+        <a href="https://solana.com" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:100px;border:1px solid rgba(153,69,255,.3);background:rgba(153,69,255,.07);text-decoration:none;cursor:pointer">
+          <svg width="16" height="14" viewBox="0 0 397 312" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M64.6 237.9c2.4-2.4 5.7-3.8 9.2-3.8h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1l62.7-62.7z" fill="url(#a)"/><path d="M64.6 3.8C67.1 1.4 70.4 0 73.8 0h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1L64.6 3.8z" fill="url(#b)"/><path d="M333.1 120.1c-2.4-2.4-5.7-3.8-9.2-3.8H6.5c-5.8 0-8.7 7-4.6 11.1l62.7 62.7c2.4 2.4 5.7 3.8 9.2 3.8h317.4c5.8 0 8.7-7 4.6-11.1l-62.7-62.7z" fill="url(#c)"/><defs><linearGradient id="a" x1="360.9" y1="-15.5" x2="141.2" y2="322.2" gradientUnits="userSpaceOnUse"><stop stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/></linearGradient><linearGradient id="b" x1="264.8" y1="-61.5" x2="45.1" y2="276.1" gradientUnits="userSpaceOnUse"><stop stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/></linearGradient><linearGradient id="c" x1="312.5" y1="-38.4" x2="92.8" y2="299.2" gradientUnits="userSpaceOnUse"><stop stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/></linearGradient></defs></svg>
+          <span style="font-family:var(--ff-mono);font-size:.62rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(153,69,255,.85)">Powered by Solana</span>
+        </a>
+      </div>
+
+
+      <!-- Escrow sim — mobile only -->
+      <div style="margin-top:32px;display:flex;justify-content:center;width:100%" class="reveal reveal-delay-5">
+        <div class="esc-sim" id="escSimMob">
+          <div class="esc-card" id="escCardMob"><div class="esc-scan"></div>
+            <div class="esc-card-top">
+              <div class="esc-card-label">ESCROW VAULT</div>
+              <div class="esc-ai-badge" id="escAiBadgeMob"><span class="esc-ai-dot"></span>AI Verified</div>
+            </div>
+            <div class="esc-amount-row">
+              <span class="esc-currency">₦</span>
+              <span class="esc-amount" id="escAmountMob">0</span>
+            </div>
+            <div class="esc-status-row">
+              <span class="esc-status-dot" id="escStatusDotMob"></span>
+              <span class="esc-status" id="escStatusMob">Ready to lock</span>
+            </div>
+            <div class="esc-subtext" id="escSubtextMob">SmartVerify™ · Auto-release · Dispute proof</div>
+            <div class="esc-success-check" id="escCheckMob">✓</div>
+          </div>
+          <div class="esc-flow">
+            <div class="esc-flow-node"><div class="esc-node-icon">👤</div><div class="esc-node-label">Client</div></div>
+            <div class="esc-flow-track"><div class="esc-flow-line"></div><div class="esc-flow-dot" id="escFlowDotMob"></div></div>
+            <div class="esc-flow-node esc-vault-node"><div class="esc-node-icon">🔐</div><div class="esc-node-label">Escrow</div></div>
+            <div class="esc-flow-track"><div class="esc-flow-line"></div><div class="esc-flow-dot" id="escFlowDot2Mob"></div></div>
+            <div class="esc-flow-node"><div class="esc-node-icon">💻</div><div class="esc-node-label">Dev</div></div>
+          </div>
+          <button class="esc-btn" id="escBtnMob" onclick="runEscrowSimMob()">
+            <span class="esc-btn-icon"></span>
+            <span class="esc-btn-text" id="escBtnTextMob">Start Transaction</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Desktop split hero (hidden on mobile) -->
+    <div class="land-hero-split">
+      <!-- Left: text -->
+      <div class="land-hero-left">
+        <div class="land-eyebrow reveal"><span class="land-eyebrow-dot"></span>🇳🇬 Nigeria's First AI-Powered Freelance Escrow</div>
+        <h1 class="land-h1 reveal reveal-delay-1">GET PAID.<br><em>NO SCAMS.</em><br>GUARANTEED.</h1>
+        <div class="land-hero-sub reveal reveal-delay-2">
+          <div class="hero-point"><span class="hero-point-ico"></span><span>Client funds locked <em>before</em> you start</span></div>
+          <div class="hero-point"><span class="hero-point-ico"></span><span>SmartVerify™ AI <em>checks</em> every delivery</span></div>
+          <div class="hero-point"><span class="hero-point-ico"></span><span>You get paid. <em>Period.</em></span></div>
+        </div>
+        <div class="land-hero-btns reveal reveal-delay-3">
+          <button class="btn btn-a" style="padding:13px 30px;font-size:.95rem" onclick="goTo('s-waitlist')"> Join the Waitlist</button>
+        </div>
+        <div class="land-pills reveal reveal-delay-4">
+          <span class="land-pill">🇳🇬 Nigeria-first</span>
+          <span class="land-pill"> Crypto on-chain</span>
+          <span class="land-pill">✦ SmartVerify™ AI</span>
+          <span class="land-pill">₦ Fiat via Paystack</span>
+          <span class="land-pill"> WhatsApp alerts</span>
+          <span class="land-pill"> Dispute protection</span>
+        </div>
+        <!-- Powered by Solana badge -->
+        <div class="reveal reveal-delay-4" style="display:flex;justify-content:flex-start;margin-top:14px">
+          <a href="https://solana.com" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:100px;border:1px solid rgba(153,69,255,.3);background:rgba(153,69,255,.07);text-decoration:none;cursor:pointer">
+            <svg width="16" height="14" viewBox="0 0 397 312" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M64.6 237.9c2.4-2.4 5.7-3.8 9.2-3.8h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1l62.7-62.7z" fill="url(#a-split)"/><path d="M64.6 3.8C67.1 1.4 70.4 0 73.8 0h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1L64.6 3.8z" fill="url(#b-split)"/><path d="M333.1 120.1c-2.4-2.4-5.7-3.8-9.2-3.8H6.5c-5.8 0-8.7 7-4.6 11.1l62.7 62.7c2.4 2.4 5.7 3.8 9.2 3.8h317.4c5.8 0 8.7-7 4.6-11.1l-62.7-62.7z" fill="url(#c-split)"/><defs><linearGradient id="a-split" x1="360.9" y1="-15.5" x2="141.2" y2="322.2" gradientUnits="userSpaceOnUse"><stop stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/></linearGradient><linearGradient id="b-split" x1="264.8" y1="-61.5" x2="45.1" y2="276.1" gradientUnits="userSpaceOnUse"><stop stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/></linearGradient><linearGradient id="c-split" x1="312.5" y1="-38.4" x2="92.8" y2="299.2" gradientUnits="userSpaceOnUse"><stop stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/></linearGradient></defs></svg>
+            <span style="font-family:var(--ff-mono);font-size:.62rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(153,69,255,.85)">Powered by Solana</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Right: escrow simulation -->
+      <div class="land-hero-right reveal reveal-right reveal-delay-4" style="transition-duration:.75s">
+        <div class="esc-sim" id="escSimLand">
+          <div class="esc-card" id="escCardLand"><div class="esc-scan"></div>
+            <div class="esc-card-top">
+              <div class="esc-card-label">ESCROW VAULT</div>
+              <div class="esc-ai-badge" id="escAiBadgeLand">
+                <span class="esc-ai-dot"></span>AI Verified
+              </div>
+            </div>
+            <div class="esc-amount-row">
+              <span class="esc-currency">₦</span>
+              <span class="esc-amount" id="escAmountLand">0</span>
+            </div>
+            <div class="esc-status-row">
+              <span class="esc-status-dot" id="escStatusDotLand"></span>
+              <span class="esc-status" id="escStatusLand">Ready to lock</span>
+            </div>
+            <div class="esc-subtext" id="escSubtextLand">SmartVerify™ · Auto-release · Dispute proof</div>
+            <div class="esc-success-check" id="escCheckLand">✓</div>
+          </div>
+          <div class="esc-flow" id="escFlowLand">
+            <div class="esc-flow-node">
+              <div class="esc-node-icon">👤</div>
+              <div class="esc-node-label">Client</div>
+            </div>
+            <div class="esc-flow-track">
+              <div class="esc-flow-line"></div>
+              <div class="esc-flow-dot" id="escFlowDotLand"></div>
+            </div>
+            <div class="esc-flow-node esc-vault-node">
+              <div class="esc-node-icon">🔐</div>
+              <div class="esc-node-label">Escrow</div>
+            </div>
+            <div class="esc-flow-track">
+              <div class="esc-flow-line"></div>
+              <div class="esc-flow-dot" id="escFlowDot2Land"></div>
+            </div>
+            <div class="esc-flow-node">
+              <div class="esc-node-icon">💻</div>
+              <div class="esc-node-label">Dev</div>
+            </div>
+          </div>
+          <button class="esc-btn" id="escBtnLand" onclick="runEscrowSimLand()">
+            <span class="esc-btn-icon"></span>
+            <span class="esc-btn-text" id="escBtnTextLand">Start Transaction</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Scrolling ticker -->
+  <div class="land-ticker-wrap">
+    <div class="land-ticker">
+      <span class="land-ticker-item"><span class="land-ticker-dot"></span>Escrow-Protected Payments</span>
+      <span class="land-ticker-item"><span class="land-ticker-dot"></span>SmartVerify™ AI</span>
+      <span class="land-ticker-item"><span class="land-ticker-dot"></span>Crypto + Fiat Dual Rail</span>
+      <span class="land-ticker-item"><span class="land-ticker-dot"></span>WhatsApp Alerts</span>
+      <span class="land-ticker-item"><span class="land-ticker-dot"></span>Auto-Release Protection</span>
+      <span class="land-ticker-item"><span class="land-ticker-dot"></span>Dispute Resolution</span>
+      <span class="land-ticker-item"><span class="land-ticker-dot"></span>Milestone Payments</span>
+      <span class="land-ticker-item"><span class="land-ticker-dot"></span>Nigeria-First Design</span>
+      <span class="land-ticker-item"><span class="land-ticker-dot"></span>Zero Lock-In</span>
+      <span class="land-ticker-item"><span class="land-ticker-dot"></span>Escrow-Protected Payments</span>
+      <span class="land-ticker-item"><span class="land-ticker-dot"></span>SmartVerify™ AI</span>
+      <span class="land-ticker-item"><span class="land-ticker-dot"></span>Crypto + Fiat Dual Rail</span>
+      <span class="land-ticker-item"><span class="land-ticker-dot"></span>WhatsApp Alerts</span>
+      <span class="land-ticker-item"><span class="land-ticker-dot"></span>Auto-Release Protection</span>
+      <span class="land-ticker-item"><span class="land-ticker-dot"></span>Dispute Resolution</span>
+      <span class="land-ticker-item"><span class="land-ticker-dot"></span>Milestone Payments</span>
+      <span class="land-ticker-item"><span class="land-ticker-dot"></span>Nigeria-First Design</span>
+      <span class="land-ticker-item"><span class="land-ticker-dot"></span>Zero Lock-In</span>
+    </div>
+  </div>
+
+  <!-- THE PROBLEM -->
+  <div class="land-problem">
+    <div class="land-section">
+      <div class="land-sec-label reveal">The Problem</div>
+      <h2 class="land-sec-h2 reveal reveal-delay-1"><span class="headline-count" data-count="1">1</span> IN <span class="headline-count" data-count="3">3</span> NIGERIAN FREELANCERS<br>GETS SCAMMED.</h2>
+      <p class="land-sec-sub reveal reveal-delay-2">Nigeria's freelance market is booming — but trust isn't. Clients disappear after delivery. Freelancers deliver nothing and vanish. There's no middleman. No protection. No recourse.</p>
+      <div class="land-stat-row reveal reveal-delay-3">
+        <div class="land-stat">
+          <div class="land-stat-num" data-count="33">0</div>
+          <div class="land-stat-label">% Scam Rate</div>
+        </div>
+        <div class="land-stat">
+          <div class="land-stat-num" data-count="4200" data-suffix="+">0</div>
+          <div class="land-stat-label">Freelancers Affected Daily</div>
+        </div>
+        <div class="land-stat">
+          <div class="land-stat-num" data-count="480" data-prefix="₦" data-suffix="M+">₦0</div>
+          <div class="land-stat-label">Lost Monthly in Nigeria*</div>
+        </div>
+        <div class="land-stat">
+          <div class="land-stat-num" data-count="0" data-static="ZERO">ZERO</div>
+          <div class="land-stat-label">Existing Protections</div>
+        </div>
+      </div>
+      <div class="land-pain-grid">
+        <div class="land-pain-card reveal reveal-left reveal-delay-1">
+          <h3>Ghosting Clients</h3>
+          <p>Client loves the work, then disappears without paying. No contract, no protection, no way to chase them.</p>
+        </div>
+        <div class="land-pain-card reveal reveal-delay-2">
+          <h3>Upfront Scams</h3>
+          <p>Clients pay upfront, freelancer delivers nothing and vanishes. Happens daily across Nigeria — and no one protects you when it does.</p>
+        </div>
+        <div class="land-pain-card reveal reveal-right reveal-delay-3">
+          <h3>Cross-Border Friction</h3>
+          <p>Paying in USD or Crypto from Lagos is a headache. Banks block. Cards fail. Freelancers lose global clients.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="land-hiw">
+    <div class="land-section">
+      <div class="land-sec-label reveal">How It Works</div>
+      <h2 class="land-sec-h2 reveal reveal-delay-1">FIVE STEPS TO ZERO SCAMS.</h2>
+      <p class="land-sec-sub">Trustana sits between client and freelancer. Funds lock before work starts. AI verifies delivery. Everyone gets a fair deal.</p>
+      <div class="land-steps">
+
+        <div class="land-step reveal reveal-delay-1">
+          <div class="land-step-num">01</div>
+          <div class="land-step-body">
+            <h3>Client Locks Payment</h3>
+            <p>Pay in Crypto via Phantom or Fiat via Paystack. Split into milestones for larger projects. Funds are secured in escrow — not sent to the freelancer yet. Work can begin.</p>
+          </div>
+        </div>
+
+        <div class="land-step reveal reveal-delay-2">
+          <div class="land-step-num">02</div>
+          <div class="land-step-body">
+            <h3>Freelancer Delivers</h3>
+            <p>Submit a delivery link and notes when the job is done. WhatsApp alert sent to the client instantly. Everything is timestamped and on record.</p>
+          </div>
+        </div>
+
+        <div class="land-step reveal reveal-delay-3">
+          <div class="land-step-num">03</div>
+          <div class="land-step-body">
+            <h3>SmartVerify™ AI Reviews</h3>
+            <p>Claude AI reads the original job requirements and checks them against the delivery — scoring each one. Pass, Partial, or Fail — with a full breakdown. No human bias. No favoritism.</p>
+            <span class="land-step-tag">✦ Powered by Claude AI</span>
+          </div>
+        </div>
+
+        <div class="land-step reveal reveal-delay-4">
+          <div class="land-step-num">04</div>
+          <div class="land-step-body">
+            <h3>Dispute? Both Sides Win Fairly.</h3>
+            <p>Raise a dispute at any point before release. Funds freeze for 48 hours. Both parties submit their case. AI-assisted arbitration — transparent and final.</p>
+          </div>
+        </div>
+
+        <div class="land-step reveal reveal-delay-5">
+          <div class="land-step-num">05</div>
+          <div class="land-step-body">
+            <h3>Freelancer Gets Paid</h3>
+            <p>Client releases manually, or funds auto-release 12 hours after submission if no action is taken. Crypto to wallet. Fiat to bank. Instantly.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- HOW THE MONEY MOVES -->
+  <div class="money-flow-section">
+    <div class="money-flow-inner">
+      <div class="land-sec-label reveal" style="text-align:center">The Flow</div>
+      <h2 class="land-sec-h2 reveal reveal-delay-1" style="text-align:center">HOW THE MONEY MOVES.</h2>
+      <p class="land-sec-sub reveal reveal-delay-2" style="text-align:center;margin:0 auto">Client locks funds before work starts. SmartVerify™ AI checks the delivery. Funds release automatically. No trust required — the protocol handles it.</p>
+
+      <div class="money-flow-nodes reveal reveal-delay-3">
+        <!-- Client node -->
+        <div class="mf-node">
+          <div class="mf-node-circle">👤</div>
+          <div class="mf-node-label">CLIENT</div>
+          <div class="mf-node-sub">Locks payment before work begins</div>
+        </div>
+
+        <!-- Arrow 1 -->
+        <div class="mf-connector">
+          <div class="mf-connector-action"> Lock</div>
+          <div class="mf-arrow-track"><div class="mf-arrow-fill"></div></div>
+          <div class="mf-connector-label">Crypto or Fiat</div>
+        </div>
+
+        <!-- Escrow Vault node -->
+        <div class="mf-node">
+          <div class="mf-node-circle">🏦</div>
+          <div class="mf-node-label">ESCROW VAULT</div>
+          <div class="mf-node-sub">Held by smart contract · SmartVerify™ AI verifies delivery</div>
+        </div>
+
+        <!-- Arrow 2 -->
+        <div class="mf-connector">
+          <div class="mf-connector-action" style="color:var(--green)"> Verify & Release</div>
+          <div class="mf-arrow-track"><div class="mf-arrow-fill"></div></div>
+          <div class="mf-connector-label">Auto or manual</div>
+        </div>
+
+        <!-- Freelancer node -->
+        <div class="mf-node">
+          <div class="mf-node-circle">💻</div>
+          <div class="mf-node-label">FREELANCER</div>
+          <div class="mf-node-sub">Gets paid instantly on approval</div>
+        </div>
+      </div>
+
+      <div class="mf-steps-row reveal reveal-delay-4">
+        <div class="mf-step-chip">
+          <div class="mf-step-chip-num">01</div>
+          <div class="mf-step-chip-label">Client locks Crypto or Fiat before work starts</div>
+        </div>
+        <div class="mf-step-chip">
+          <div class="mf-step-chip-num">02</div>
+          <div class="mf-step-chip-label">Freelancer delivers and submits via Trustana</div>
+        </div>
+        <div class="mf-step-chip">
+          <div class="mf-step-chip-num">03</div>
+          <div class="mf-step-chip-label">SmartVerify™ AI checks delivery against requirements</div>
+        </div>
+        <div class="mf-step-chip">
+          <div class="mf-step-chip-num">04</div>
+          <div class="mf-step-chip-label">Funds auto-release on approval · Dispute protection if not</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+   <!-- PRICING -->
+  <div class="land-pricing">
+    <div class="land-section">
+      <div class="land-sec-label reveal" style="text-align:center">Pricing</div>
+      <h2 class="land-sec-h2 reveal reveal-delay-1" style="text-align:center">SIMPLE, TRANSPARENT FEES.</h2>
+      <p class="land-sec-sub reveal reveal-delay-2" style="text-align:center;margin-left:auto;margin-right:auto">No subscriptions. No hidden charges. Pay only when funds are successfully released.</p>
+      <div class="pricing-grid">
+
+        <div class="pricing-card reveal reveal-scale reveal-delay-1">
+          <div class="pricing-tier">Starter</div>
+          <div class="pricing-amt">Free <span>to create</span></div>
+          <div class="pricing-desc">Perfect for your first escrow. No upfront cost.</div>
+          <ul class="pricing-feats">
+            <li><span class="pf-y">✓</span> Unlimited escrow creation</li>
+            <li><span class="pf-y">✓</span> Crypto + Fiat payments</li>
+            <li><span class="pf-y">✓</span> SmartVerify™ AI (1 scan/escrow)</li>
+            <li><span class="pf-y">✓</span> WhatsApp alerts</li>
+            <li><span class="pf-n">–</span> Milestone payments</li>
+            <li><span class="pf-n">–</span> Priority dispute resolution</li>
+          </ul>
+          <div style="font-family:var(--ff-head);font-size:1.1rem;color:var(--amber);margin-bottom:4px">2.5% <span style="font-family:var(--ff-ui);font-size:.72rem;color:var(--stone);font-weight:400">platform fee on release</span></div>
+        </div>
+
+        <div class="pricing-card featured reveal reveal-scale reveal-delay-2">
+          <div class="pricing-badge">MOST POPULAR</div>
+          <div class="pricing-tier">Growth</div>
+          <div class="pricing-amt">1.8% <span>platform fee</span></div>
+          <div class="pricing-desc">For active freelancers doing 3+ jobs a month.</div>
+          <ul class="pricing-feats">
+            <li><span class="pf-y">✓</span> Everything in Starter</li>
+            <li><span class="pf-y">✓</span> Milestone payments (up to 5)</li>
+            <li><span class="pf-y">✓</span> SmartVerify™ per milestone</li>
+            <li><span class="pf-y">✓</span> Public profile + shareable link</li>
+            <li><span class="pf-y">✓</span> Priority dispute resolution</li>
+            <li><span class="pf-y">✓</span> Referral bonuses</li>
+          </ul>
+          <div style="font-family:var(--ff-head);font-size:1.1rem;color:var(--amber);margin-bottom:4px">Early access: <span style="font-family:var(--ff-ui);font-size:.72rem;color:var(--stone);font-weight:400">waitlist members locked in at this rate</span></div>
+        </div>
+
+        <div class="pricing-card reveal reveal-scale reveal-delay-3">
+          <div class="pricing-tier">Scale</div>
+          <div class="pricing-amt">1.2% <span>platform fee</span></div>
+          <div class="pricing-desc">For agencies and high-volume clients. Volume pricing available.</div>
+          <ul class="pricing-feats">
+            <li><span class="pf-y">✓</span> Everything in Growth</li>
+            <li><span class="pf-y">✓</span> Unlimited milestones</li>
+            <li><span class="pf-y">✓</span> Dedicated account manager</li>
+            <li><span class="pf-y">✓</span> API access (coming soon)</li>
+            <li><span class="pf-y">✓</span> Custom branding (coming soon)</li>
+            <li><span class="pf-y">✓</span> SLA-backed dispute resolution</li>
+          </ul>
+          <div style="font-family:var(--ff-head);font-size:1.1rem;color:var(--amber);margin-bottom:4px">Contact us <span style="font-family:var(--ff-ui);font-size:.72rem;color:var(--stone);font-weight:400">for agency pricing</span></div>
+        </div>
+
+      </div>
+      <br>
+      <p class="reveal" style="text-align:center;font-size:.66rem;color:var(--stone);margin-top:4px;margin-bottom:20px">*₦480M+ is an estimated figure based on reported freelance fraud data for Nigeria (2024–2026).</p>
+      <p class="reveal reveal-delay-4" style="text-align:center;font-size:.7rem;color:var(--stone);margin-top:20px">*All fees apply only on successful payment release. Cancelled or disputed escrows are not charged. Early access waitlist members lock in Growth pricing for life.</p>
+    </div>
+  </div>
+
+
+
+
+  <!-- FEATURES -->
+  <div class="land-features">
+    <div class="land-section">
+      <div class="land-sec-label reveal">Features</div>
+      <h2 class="land-sec-h2 reveal reveal-delay-1">BUILT FOR NIGERIA.<br>UNIQUE IN THE WORLD.</h2>
+      <p class="land-sec-sub">Every feature was designed around one question: what does a Nigerian freelancer actually need to feel safe getting paid?</p>
+      <div class="land-feat-grid">
+
+        <div class="land-feat reveal reveal-scale reveal-delay-1">
+          <div class="land-feat-stripe" style="background:linear-gradient(90deg,var(--purple),transparent)"></div>
+          <div class="land-feat-ico" style="background:var(--purple-dim)">✦</div>
+          <h3>SmartVerify™ AI</h3>
+          <p>Claude AI checks every single job requirement against the delivery and gives a scored verdict before a cent is released. No other escrow product on earth does this.</p>
+        </div>
+
+        <div class="land-feat reveal reveal-scale reveal-delay-2">
+          <div class="land-feat-stripe" style="background:linear-gradient(90deg,var(--naira),transparent)"></div>
+          <div class="land-feat-ico" style="background:var(--naira-dim)">⚡</div>
+          <h3>Dual Rail — Crypto + Fiat</h3>
+          <p>Lock in Crypto for global clients or Fiat via Paystack for local ones. Nigeria's only dual-rail freelance escrow. Pay by card, bank transfer, or USSD.</p>
+        </div>
+
+        <div class="land-feat reveal reveal-scale reveal-delay-1">
+          <div class="land-feat-stripe" style="background:linear-gradient(90deg,var(--blue),transparent)"></div>
+          <div class="land-feat-ico" style="background:var(--blue-dim)">📊</div>
+          <h3>Milestone Payments</h3>
+          <p>Split any project into up to 3 milestones. Each with its own lock and release. Clients trust it more. Freelancers get paid progressively, not all at the end.</p>
+        </div>
+
+        <div class="land-feat reveal reveal-scale reveal-delay-2">
+          <div class="land-feat-stripe" style="background:linear-gradient(90deg,var(--wa),transparent)"></div>
+          <div class="land-feat-ico" style="background:var(--wa-dim)">📱</div>
+          <h3>WhatsApp Alerts</h3>
+          <p>Every key action — lock, delivery, release, dispute — fires a WhatsApp notification. Nigerian freelancers live on WhatsApp. So does Trustana.</p>
+        </div>
+
+        <div class="land-feat reveal reveal-scale reveal-delay-1">
+          <div class="land-feat-stripe" style="background:linear-gradient(90deg,var(--amber),transparent)"></div>
+          <div class="land-feat-ico" style="background:var(--amber-dim)">⏱</div>
+          <h3>Auto-Release Protection</h3>
+          <p>Funds auto-release to the freelancer 12 hours after delivery if the client goes silent. No more ghosting clients holding your payment hostage.</p>
+        </div>
+
+        <div class="land-feat reveal reveal-scale reveal-delay-2">
+          <div class="land-feat-stripe" style="background:linear-gradient(90deg,var(--orange),transparent)"></div>
+          <div class="land-feat-ico" style="background:var(--orange-dim)">⚖️</div>
+          <h3>Fair Dispute Resolution</h3>
+          <p>Raise a dispute anytime before release. Funds freeze for 48 hours. Both parties state their case. AI-assisted arbitration that's transparent and impartial.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- TESTIMONIALS -->
+  <div class="land-testimonials">
+    <div class="land-section">
+      <div class="land-sec-label reveal" style="text-align:center">Real Stories</div>
+      <h2 class="land-sec-h2 reveal reveal-delay-1" style="text-align:center">THEY STOPPED GETTING<br>SCAMMED.</h2>
+
+      <div class="test-carousel reveal reveal-delay-2">
+        <button class="test-arrow test-arrow-prev" onclick="testimonialScroll(-1)" aria-label="Previous testimonials">‹</button>
+
+        <div class="test-viewport" id="testViewport">
+          <div class="test-track" id="testTrack">
+
+            <div class="test-slide">
+              <div class="test-card" tabindex="0" onclick="openTestimonialModal(0)" onkeydown="if(event.key==='Enter')openTestimonialModal(0)">
+                <div class="test-stars">★★★★★</div>
+                <p class="test-body test-body-clip">I built a full e-commerce site for a client in the UK who found me on Twitter. He locked £800 equivalent in Crypto before I wrote a single line of code. SmartVerify gave me 94%. I got paid in 20 minutes. I've never felt that safe on a remote job.</p>
+                <div class="test-read-more">Read full story →</div>
+                <div class="test-author">
+                  <div class="test-av" style="background:rgba(45,212,160,.15);color:var(--green)">CU</div>
+                  <div>
+                    <div class="test-name">Chidera Umeh</div>
+                    <div class="test-role">Full-stack Developer · Lagos</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="test-slide">
+              <div class="test-card" tabindex="0" onclick="openTestimonialModal(1)" onkeydown="if(event.key==='Enter')openTestimonialModal(1)">
+                <div class="test-stars">★★★★★</div>
+                <p class="test-body test-body-clip">I hired 3 designers in 6 months before Trustana. Two of them ghosted after taking upfront. On Trustana, I locked ₦120,000 for a brand kit. The designer delivered in 4 days, AI verified it, and the funds went to her automatically. No drama.</p>
+                <div class="test-read-more">Read full story →</div>
+                <div class="test-author">
+                  <div class="test-av" style="background:rgba(245,166,35,.15);color:var(--amber)">TA</div>
+                  <div>
+                    <div class="test-name">Tunde Afolabi</div>
+                    <div class="test-role">Startup Founder · Abuja</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="test-slide">
+              <div class="test-card" tabindex="0" onclick="openTestimonialModal(2)" onkeydown="if(event.key==='Enter')openTestimonialModal(2)">
+                <div class="test-stars">★★★★☆</div>
+                <p class="test-body test-body-clip">The milestone feature is a game changer. I split a ₦350,000 React project into 3 milestones. Client released each one as I delivered. When they raised a dispute on milestone 3, the AI sided with me — I had the GitHub commits and demo link. Got paid in full.</p>
+                <div class="test-read-more">Read full story →</div>
+                <div class="test-author">
+                  <div class="test-av" style="background:rgba(91,139,245,.15);color:var(--blue)">AN</div>
+                  <div>
+                    <div class="test-name">Adaeze Nwosu</div>
+                    <div class="test-role">React Developer · Port Harcourt</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="test-slide">
+              <div class="test-card" tabindex="0" onclick="openTestimonialModal(3)" onkeydown="if(event.key==='Enter')openTestimonialModal(3)">
+                <div class="test-stars">★★★★★</div>
+                <p class="test-body test-body-clip">My client kept saying "let me pay after I check it properly" — that's how I've lost money before. This time we locked $150 in USDC. I delivered the landing page, SmartVerify scored it 91%, and the WhatsApp alert hit my phone the second it released. Instant.</p>
+                <div class="test-read-more">Read full story →</div>
+                <div class="test-author">
+                  <div class="test-av" style="background:rgba(168,85,247,.15);color:var(--purple)">FO</div>
+                  <div>
+                    <div class="test-name">Fisayo Ogunleye</div>
+                    <div class="test-role">UI/UX Designer · Ibadan</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="test-slide">
+              <div class="test-card" tabindex="0" onclick="openTestimonialModal(4)" onkeydown="if(event.key==='Enter')openTestimonialModal(4)">
+                <div class="test-stars">★★★★★</div>
+                <p class="test-body test-body-clip">I've been freelancing for 5 years and this is the first platform that actually protects the client too, not just the freelancer. I locked ₦480,000 for a mobile app rebuild. Watching the escrow status update in real time gave me way more confidence than any invoice ever did.</p>
+                <div class="test-read-more">Read full story →</div>
+                <div class="test-author">
+                  <div class="test-av" style="background:rgba(255,90,90,.15);color:var(--red)">KE</div>
+                  <div>
+                    <div class="test-name">Kemi Eze</div>
+                    <div class="test-role">Product Manager · Lagos</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="test-slide">
+              <div class="test-card" tabindex="0" onclick="openTestimonialModal(5)" onkeydown="if(event.key==='Enter')openTestimonialModal(5)">
+                <div class="test-stars">★★★★☆</div>
+                <p class="test-body test-body-clip">A client tried to claim my logo design "wasn't what we agreed on" after approving the brief himself. I hit dispute, uploaded my Figma revision history and our chat log. Arbitration froze the funds, reviewed both sides, and ruled in my favor within a day.</p>
+                <div class="test-read-more">Read full story →</div>
+                <div class="test-author">
+                  <div class="test-av" style="background:rgba(45,212,160,.15);color:var(--green)">BO</div>
+                  <div>
+                    <div class="test-name">Bolaji Okafor</div>
+                    <div class="test-role">Graphic Designer · Enugu</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="test-slide">
+              <div class="test-card" tabindex="0" onclick="openTestimonialModal(6)" onkeydown="if(event.key==='Enter')openTestimonialModal(6)">
+                <div class="test-stars">★★★★★</div>
+                <p class="test-body test-body-clip">Getting paid in Naira without losing money to conversion fees was the deciding factor for me. My client paid through Paystack, I got my payout the same day the milestone was approved. No more waiting a week for a bank transfer to clear.</p>
+                <div class="test-read-more">Read full story →</div>
+                <div class="test-author">
+                  <div class="test-av" style="background:rgba(245,166,35,.15);color:var(--amber)">NI</div>
+                  <div>
+                    <div class="test-name">Ngozi Ibe</div>
+                    <div class="test-role">Content Writer · Owerri</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <button class="test-arrow test-arrow-next" onclick="testimonialScroll(1)" aria-label="Next testimonials">›</button>
+      </div>
+
+      <div class="test-dots" id="testDots"></div>
+    </div>
+  </div>
+
+  <!-- TESTIMONIAL READ MODAL -->
+  <div class="modal-bg" id="m-testimonial" onclick="if(event.target===this)closeModal('m-testimonial')">
+    <div class="modal" style="max-width:460px">
+      <button class="modal-x" onclick="closeModal('m-testimonial')">✕</button>
+      <div class="test-stars" id="tm-stars" style="text-align:center;margin-bottom:14px"></div>
+      <p id="tm-body" style="font-size:.92rem;color:var(--stone2);line-height:1.8;font-style:italic;margin-bottom:20px"></p>
+      <div class="test-author" style="justify-content:center">
+        <div class="test-av" id="tm-av" style="width:44px;height:44px;font-size:1.05rem"></div>
+        <div>
+          <div class="test-name" id="tm-name" style="font-size:.9rem"></div>
+          <div class="test-role" id="tm-role"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+ 
+
+  <!-- FAQ -->
+  <div class="land-faq">
+    <div class="land-section">
+      <div class="land-sec-label reveal">FAQ</div>
+      <h2 class="land-sec-h2 reveal reveal-delay-1">GOT QUESTIONS?<br>WE'VE GOT ANSWERS.</h2>
+      <p class="land-sec-sub reveal reveal-delay-2">Everything you need to know before you trust us with your payments.</p>
+      <div class="faq-list reveal reveal-delay-3">
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="faq-q-text">What is Trustana and how does it work?</span>
+            <span class="faq-chevron">▾</span>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Trustana is a freelance escrow platform for Africa. When a client hires a freelancer, the client locks payment (in Crypto or Fiat) into a secure escrow before work begins. The freelancer delivers the work and submits a delivery link. Our <strong>SmartVerify™ AI</strong> checks the delivery against the original requirements and scores it. If everything checks out, the client releases the funds — or they auto-release after 12 hours if the client takes no action.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="faq-q-text">Is my money safe? What if something goes wrong?</span>
+            <span class="faq-chevron">▾</span>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Yes. Funds are locked in escrow and <strong>cannot be accessed by anyone</strong> until the escrow is resolved. If there's a dispute, funds freeze for 48 hours and both sides submit their case. Our AI-assisted arbitration process reviews both sides fairly and issues a binding recommendation. Neither party can simply take the money and run.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="faq-q-text">What currencies and payment methods are supported?</span>
+            <span class="faq-chevron">▾</span>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">We support two payment rails: <strong>Crypto (Solana)</strong> for crypto-native and international payments via Phantom wallet, and <strong>Fiat (NGN)</strong> for local Nigerian payments via Paystack — which supports card, bank transfer, and USSD. More currencies and African payment methods are on our roadmap.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="faq-q-text">What is SmartVerify™ and can it be fooled?</span>
+            <span class="faq-chevron">▾</span>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">SmartVerify™ is powered by Claude AI (Anthropic). When a freelancer submits work, Claude reads the original job description and requirements, then checks each one against the delivery link and notes — scoring pass, partial, or fail per requirement. It's not foolproof (no AI is), but it provides an objective, bias-free first pass that removes the human tendency to be swayed by excuses or pressure. The final decision always involves human context.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="faq-q-text">What happens if the client disappears after I deliver?</span>
+            <span class="faq-chevron">▾</span>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">This is exactly why Trustana exists. Once you submit your delivery, an <strong>auto-release timer starts (12 hours)</strong>. If the client takes no action — doesn't approve, doesn't dispute — the funds are automatically released to you. No chasing. No ghosting. You get paid regardless.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="faq-q-text">How much does Trustana cost?</span>
+            <span class="faq-chevron">▾</span>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Creating an account is completely free. Trustana charges a <strong style="color:var(--amber)">2.5% platform fee</strong> only on successfully released escrows — nothing on cancellations or disputes. Growth tier (1.8%) is locked in for waitlist members. <a onclick="document.querySelector('.land-pricing').scrollIntoView({behavior:'smooth'})">See full pricing →</a></div></div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="faq-q-text">Is Trustana available outside Nigeria?</span>
+            <span class="faq-chevron">▾</span>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">Trustana is Nigeria-first but not Nigeria-only. The Crypto payment rail works globally — any client anywhere in the world can lock Crypto. The Fiat rail is currently NGN only. We're actively expanding to Ghana, Kenya, and South Africa, with more African markets to follow. If you're in the diaspora, Crypto payments work for you right now.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span class="faq-q-text">Do I need a crypto wallet to use Trustana?</span>
+            <span class="faq-chevron">▾</span>
+          </div>
+          <div class="faq-a"><div class="faq-a-inner">No. If you're using Fiat payments, you don't need a crypto wallet at all — just a Nigerian bank account or card via Paystack. A Solana wallet (like Phantom) is only required for Crypto payments. You can also add wallet addresses manually if you don't have Phantom installed.</div></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="land-cta">
+    <div class="land-sec-label reveal" style="text-align:center;margin-bottom:14px">Ready?</div>
+    <h2 class="land-cta-h reveal reveal-delay-1">STOP WORKING<br>ON <em>TRUST.</em><br>START BUILDING ON IT.</h2>
+    <p class="land-cta-sub reveal reveal-delay-2">Join thousands of Nigerian freelancers and clients who've said enough to payment scams. Free to get started. No lock-in.</p>
+    <div class="land-cta-btns reveal reveal-delay-3">
+      <button class="btn btn-a" style="padding:13px 30px;font-size:.95rem" onclick="goTo('s-waitlist')"> Join the Waitlist</button>
+    </div>
+    <div style="margin-top:14px;font-size:.7rem;color:var(--stone)">No credit card required &nbsp;·&nbsp; Works on mobile &nbsp;·&nbsp; Crypto + Fiat</div>
+  </div>
+
+  <!-- Footer -->
+  <div class="land-footer">
+    <div class="land-footer-inner">
+
+
+      <!-- Brand col -->
+      <div class="land-footer-brand">
+        <div style="font-family:var(--ff-head);font-size:1.4rem;letter-spacing:3px;color:var(--amber);margin-bottom:8px;display:flex;align-items:center;gap:8px">
+          <div style="width:20px;height:20px;background:var(--amber);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);filter:drop-shadow(0 2px 6px var(--amber-glow))"></div>
+          TRUSTANA
+        </div>
+        <div style="font-size:.78rem;color:var(--stone);line-height:1.65;max-width:260px;margin-bottom:16px">Nigeria's first AI-powered freelance escrow. Lock payments in Crypto or Fiat before work starts. SmartVerify™ AI checks every delivery.</div>
+        <div class="land-socials">
+          <a class="soc-btn" href="https://x.com/TRUSTANA_" target="_blank" rel="noopener" title="X (Twitter)">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <a class="soc-btn" href="https://www.instagram.com/trusana_official?igsh=MWN5aWJub2h2NzQ2ag==" target="_blank" rel="noopener" title="Instagram">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          </a>
+          <a class="soc-btn" href="https://www.linkedin.com/in/trustana-undefined-144568418?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" rel="noopener" title="LinkedIn">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </a>
+          <a class="soc-btn" href="https://www.facebook.com/share/1HGESbo7Kx/" target="_blank" rel="noopener" title="Facebook">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+        </div>
+      </div>
+
+
+
+      <!-- Product col -->
+      <div class="land-footer-col">
+        <h4>Product</h4>
+        <a onclick="goTo('s-waitlist')">Join Waitlist</a>
+        <a onclick="document.querySelector('.land-hiw').scrollIntoView({behavior:'smooth'})">How It Works</a>
+        <a onclick="document.querySelector('.land-features').scrollIntoView({behavior:'smooth'})">Features</a>
+        <a onclick="document.querySelector('.land-faq').scrollIntoView({behavior:'smooth'})">FAQ</a>
+      </div>
+
+
+      <!-- Payments col -->
+      <div class="land-footer-col">
+        <h4>Payments</h4>
+        <a>Crypto (Solana)</a>
+        <a>Fiat via Paystack</a>
+        <a>Milestone Payments</a>
+        <a>Auto-Release</a>
+        <a>Dispute Resolution</a>
+      </div>
+
+      
+      <!-- Company col -->
+      <div class="land-footer-col">
+        <h4>Company</h4>
+        <a onclick="goToAbout()" style="cursor:pointer">About Trustana</a>
+        <a onclick="goToKwara()" style="cursor:pointer">Built in Kwara 🇳🇬</a>
+        <a onclick="openSuperteamModal()" style="cursor:pointer">SuperteamNG</a>
+        <a onclick="goToContact()" style="cursor:pointer">Contact Us</a>
+        <a style="color:var(--amber)">Terms of Service</a>
+        <a style="color:var(--amber)">Privacy Policy</a>
+      </div>
+    </div>
+
+    <!-- Footer bottom bar -->
+    <div class="land-footer-bottom">
+      <div style="font-size:.65rem;color:var(--stone)">
+        © 2026 Trustana. All rights reserved. · Built by the <strong style="color:var(--white)">Trustana Team</strong>, Kwara, Nigeria
+      </div>
+      <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;font-size:.68rem;color:var(--stone2)">
+        <span>✦ SmartVerify™ AI</span><span>⚡ Solana on-chain</span><span>🇳🇬 Nigeria-first</span><span> WhatsApp alerts</span>
+      </div>
+    </div>
+
+    <!-- Mobile fallback footer (hidden on large screens by .land-footer-inner) -->
+    <div class="land-footer-mobile-only">
+      <div style="font-family:var(--ff-head);font-size:1.1rem;letter-spacing:2px;color:var(--amber);margin-bottom:6px">TRUSTANA</div>
+      <div style="font-size:.72rem;color:var(--stone);margin-bottom:16px">Nigeria's first AI-powered freelance escrow · Crypto + Fiat</div>
+      <div class="land-socials">
+        <a class="soc-btn" href="https://x.com/TRUSTANA_ftt" target="_blank" rel="noopener" title="X (Twitter)"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+        <a class="soc-btn" href="https://www.instagram.com/trusana_official?igsh=MWN5aWJub2h2NzQ2ag==" target="_blank" rel="noopener" title="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+        <a class="soc-btn" href="https://www.linkedin.com/in/trustana-undefined-144568418?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" rel="noopener" title="LinkedIn"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        <a class="soc-btn" href="https://www.facebook.com/share/1HGESbo7Kx/" target="_blank" rel="noopener" title="Facebook"><svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+      </div>
+      <div style="font-size:.65rem;color:var(--stone);border-top:1px solid var(--border);padding-top:14px;margin-top:12px">
+        Built by the <strong style="color:var(--white)">Trustana Team</strong> · Kwara, Nigeria<br>
+        <span style="opacity:.5">Powered by Claude AI · Solana · Paystack · Twilio</span>
+      </div>
+      <div style="margin-top:12px;font-size:.63rem;color:var(--stone);opacity:.6">© 2026 Trustana. All rights reserved.</div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- SUPERTEAM NG MODAL -->
+<div id="m-superteam" style="display:none;position:fixed;inset:0;z-index:9000;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.72);backdrop-filter:blur(6px)" onclick="if(event.target===this)closeSuperteamModal()">
+  <div style="position:relative;background:var(--ink2);border:1px solid var(--border);border-radius:var(--r);max-width:480px;width:100%;box-shadow:0 32px 80px rgba(0,0,0,.6);overflow:hidden">
+    <!-- amber top bar -->
+    <div style="height:3px;background:linear-gradient(90deg,var(--amber),var(--purple))"></div>
+    <div style="padding:28px 28px 24px">
+      <!-- header -->
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+        <div style="width:44px;height:44px;background:var(--amber-dim);border:1px solid rgba(245,166,35,.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">⚡</div>
+        <div>
+          <div style="font-family:var(--ff-head);font-size:1.3rem;letter-spacing:2px;color:var(--white)">SUPERTEAM NIGERIA</div>
+          <div style="font-size:.72rem;color:var(--amber);font-weight:600;letter-spacing:.8px;text-transform:uppercase;margin-top:2px">Nigeria's Solana Builder Community</div>
+        </div>
+        <button onclick="closeSuperteamModal()" style="margin-left:auto;background:none;border:none;color:var(--stone);cursor:pointer;font-size:1.1rem;padding:4px;line-height:1;flex-shrink:0">✕</button>
+      </div>
+
+      <!-- description -->
+      <p style="font-size:.85rem;color:var(--stone2);line-height:1.75;margin-bottom:18px">
+        SuperteamNG is Nigeria's chapter of <strong style="color:var(--white)">Superteam</strong> — a global collective of the best Solana builders, designers, and marketers. The community backs projects that build real products on Solana for African users.
+      </p>
+
+      <!-- connection to Trustana -->
+      <div style="background:var(--amber-dim);border:1px solid rgba(245,166,35,.2);border-radius:var(--r2);padding:14px 16px;margin-bottom:18px">
+        <div style="font-size:.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--amber);margin-bottom:6px">🔗 Trustana × SuperteamNG</div>
+        <p style="font-size:.82rem;color:var(--stone2);line-height:1.65;margin:0">Trustana was conceived and built within the SuperteamNG ecosystem — from Kwara, Nigeria. Our team are active members helping drive the mission of building Africa on Solana.</p>
+      </div>
+
+      <!-- pills -->
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px">
+        <span style="background:var(--ink3);border:1px solid var(--border);border-radius:100px;padding:5px 12px;font-size:.7rem;color:var(--stone2)">⚡ Solana ecosystem</span>
+        <span style="background:var(--ink3);border:1px solid var(--border);border-radius:100px;padding:5px 12px;font-size:.7rem;color:var(--stone2)">🇳🇬 Nigeria-first</span>
+        <span style="background:var(--ink3);border:1px solid var(--border);border-radius:100px;padding:5px 12px;font-size:.7rem;color:var(--stone2)">🌍 Africa on Solana</span>
+        <span style="background:var(--ink3);border:1px solid var(--border);border-radius:100px;padding:5px 12px;font-size:.7rem;color:var(--stone2)">🛠 Builders & Hackers</span>
+      </div>
+
+      <!-- cta -->
+      <a href="https://superteam.fun/nigeria" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--amber);color:var(--ink);font-family:var(--ff-head);font-size:1rem;letter-spacing:2px;padding:13px;border-radius:var(--r2);text-decoration:none;transition:all var(--trans)" onmouseover="this.style.background='var(--amber2)';this.style.boxShadow='0 8px 24px var(--amber-glow)'" onmouseout="this.style.background='var(--amber)';this.style.boxShadow='none'">
+        VISIT SUPERTEAM NIGERIA ↗
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="screen" id="s-about">
+  <canvas id="about-canvas"></canvas>
+  <nav class="land-nav" style="position:fixed;top:0;left:0;right:0;z-index:500">
+    <div class="land-logo" onclick="goTo('s-land')" style="cursor:pointer">
+      <div class="land-logo-mark"></div>TRUSTANA
+    </div>
+    <div class="land-nav-btns">
+      <button class="btn btn-ghost" style="padding:7px 14px;font-size:.76rem;background:none;border:none;color:var(--amber);cursor:pointer;font-weight:600" onclick="goToAbout()">About</button>
+      <button class="btn btn-ghost" style="padding:7px 14px;font-size:.76rem;background:none;border:none;color:var(--stone2);cursor:pointer" onclick="goToContact()">Contact</button>
+      <button class="btn btn-a" style="padding:7px 16px;font-size:.76rem" onclick="goTo('s-waitlist');setTimeout(()=>document.getElementById('wl-email')&&document.getElementById('wl-email').focus(),400)">Join Waitlist</button>
+    </div>
+    <button class="land-hamburger" id="about-hamburger" onclick="toggleAboutMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+  <div class="land-mobile-menu" id="about-mobile-menu">
+    <button onclick="goTo('s-land');document.getElementById('about-mobile-menu').classList.remove('open');document.getElementById('about-hamburger').classList.remove('open')"> Home</button>
+    <button onclick="goToAbout();document.getElementById('about-mobile-menu').classList.remove('open');document.getElementById('about-hamburger').classList.remove('open')" style="color:var(--amber);border-color:rgba(245,166,35,.25)">About</button>
+    <button onclick="goToContact();document.getElementById('about-mobile-menu').classList.remove('open');document.getElementById('about-hamburger').classList.remove('open')">Contact</button>
+    <button class="mmenu-waitlist" onclick="goTo('s-waitlist');setTimeout(()=>document.getElementById('wl-email')&&document.getElementById('wl-email').focus(),400);document.getElementById('about-mobile-menu').classList.remove('open');document.getElementById('about-hamburger').classList.remove('open')"> Join Waitlist</button>
+  </div>
+  <div style="height:60px;flex-shrink:0"></div>
+
+  <div class="about-wrap">
+
+    <!-- Hero -->
+    <div class="about-hero">
+      <div class="land-sec-label" style="text-align:center;margin-bottom:12px">Our Story</div>
+      <h1 class="about-h1">WE BUILT THE<br>ESCROW WE <em>NEEDED.</em></h1>
+      <p class="about-lead">Three Nigerian builders. One shared frustration. Clients who ghost. Freelancers who disappear. No middleman. No protection. So we built one — powered by AI and Solana.</p>
+      <!-- Powered by Solana badge -->
+      <div style="display:flex;justify-content:center;margin-top:18px">
+        <a href="https://solana.com" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:100px;border:1px solid rgba(153,69,255,.3);background:rgba(153,69,255,.07);text-decoration:none;cursor:pointer">
+          <svg width="16" height="14" viewBox="0 0 397 312" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M64.6 237.9c2.4-2.4 5.7-3.8 9.2-3.8h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1l62.7-62.7z" fill="url(#a-about)"/><path d="M64.6 3.8C67.1 1.4 70.4 0 73.8 0h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1L64.6 3.8z" fill="url(#b-about)"/><path d="M333.1 120.1c-2.4-2.4-5.7-3.8-9.2-3.8H6.5c-5.8 0-8.7 7-4.6 11.1l62.7 62.7c2.4 2.4 5.7 3.8 9.2 3.8h317.4c5.8 0 8.7-7 4.6-11.1l-62.7-62.7z" fill="url(#c-about)"/><defs><linearGradient id="a-about" x1="360.9" y1="-15.5" x2="141.2" y2="322.2" gradientUnits="userSpaceOnUse"><stop stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/></linearGradient><linearGradient id="b-about" x1="264.8" y1="-61.5" x2="45.1" y2="276.1" gradientUnits="userSpaceOnUse"><stop stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/></linearGradient><linearGradient id="c-about" x1="312.5" y1="-38.4" x2="92.8" y2="299.2" gradientUnits="userSpaceOnUse"><stop stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/></linearGradient></defs></svg>
+          <span style="font-family:var(--ff-mono);font-size:.62rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(153,69,255,.85)">Powered by Solana</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Mission -->
+    <div class="about-mission">
+      <div class="about-mission-text">"Nigeria's freelance economy is worth billions. None of that matters if you can't trust who you're working with."</div>
+      <div class="about-mission-sub">Our mission is to make every Nigerian freelance transaction safe, verifiable, and instant — without requiring either party to trust a stranger. The protocol handles it.</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="about-stats">
+      <div class="about-stat-card">
+        <div class="about-stat-num">33%</div>
+        <div class="about-stat-label">Nigerian freelancers scammed at least once</div>
+      </div>
+      <div class="about-stat-card">
+        <div class="about-stat-num">₦480M+</div>
+        <div class="about-stat-label">Lost monthly to payment fraud</div>
+      </div>
+      <div class="about-stat-card">
+        <div class="about-stat-num">2</div>
+        <div class="about-stat-label">Payment rails — Crypto on-chain + Fiat via Paystack</div>
+      </div>
+      <div class="about-stat-card">
+        <div class="about-stat-num">0</div>
+        <div class="about-stat-label">Existing AI-verified escrow products in Nigeria</div>
+      </div>
+    </div>
+
+    <!-- Story -->
+    <div class="about-grid" style="grid-template-columns:1fr">
+      <div class="about-story-col">
+        <h2>THE BACKSTORY</h2>
+        <p>In early 2026, a member of our team delivered a full React project for a UK-based client — three weeks of work. The client disappeared. No payment. No response. No recourse.</p>
+        <p>We looked for an escrow solution. Escrow.com was expensive and slow. PayPal had no Nigeria support. Crypto escrows were too technical for most clients. Nothing worked for the Nigerian freelance context.</p>
+        <p>So we built Trustana in a weekend. Then kept building. SmartVerify™ — our AI delivery verification engine — was the breakthrough. Instead of trusting a human arbiter, the AI checks the delivery against the original requirements and issues a verdict. No bias. No delay. No politics.</p>
+        <p>We're building this for the Chidera Okafors of Nigeria — talented developers, designers, and creatives who deserve to get paid every single time.</p>
+        <h2 style="margin-top:28px">WHAT IS TRUSTANA?</h2>
+        <p>Trustana is Nigeria's first AI-powered freelance escrow protocol. A client locks payment before any work begins, the freelancer delivers, and SmartVerify™ checks the submission against the original brief before funds are released — automatically, in seconds, with no human gatekeeper on either side.</p>
+        <p>We support two payment rails so nobody is locked out: <strong style="color:var(--white)">Solana</strong> for crypto-native and cross-border clients via Phantom wallet, and <strong style="color:var(--white)">Fiat (NGN)</strong> for local Nigerian payments via Paystack — card, bank transfer, or USSD. Milestone-based releases, built-in dispute resolution, and WhatsApp delivery alerts mean both sides always know exactly where their money and their work stand.</p>
+        <p>Every escrow is <strong style="color:var(--amber)">powered by Solana</strong> under the hood for instant, low-fee, on-chain settlement — so a client in London can lock funds for a developer in Lagos in under 30 seconds, with zero wire fees and zero currency friction.</p>
+      </div>
+    </div>
+
+    <!-- Values -->
+    <div>
+      <div class="land-sec-label" style="margin-bottom:8px">What We Stand For</div>
+      <h2 style="font-family:var(--ff-head);font-size:1.6rem;letter-spacing:1px;margin-bottom:4px">OUR VALUES</h2>
+      <div class="about-values-grid">
+        <div class="about-val">
+          <div class="about-val-title">TRUST BY DESIGN</div>
+          <div class="about-val-text">No handshake required. The protocol enforces trust. Funds are locked before work starts and released only when requirements are met.</div>
+        </div>
+        <div class="about-val">
+          <div class="about-val-title">NIGERIA FIRST</div>
+          <div class="about-val-text">We build for Nigerian freelancers, with Nigerian payment rails, on Nigerian time. WhatsApp-native. Fiat-aware. Lagos-built.</div>
+        </div>
+        <div class="about-val">
+          <div class="about-val-title">AI WITH ACCOUNTABILITY</div>
+          <div class="about-val-text">SmartVerify™ doesn't just score delivery — it explains its verdict. Transparent AI, not a black box. Freelancers and clients both see the reasoning.</div>
+        </div>
+        <div class="about-val">
+          <div class="about-val-title">SPEED OVER CEREMONY</div>
+          <div class="about-val-text">Sub-second payment release. 8-hour auto-release window. No 3-day bank transfers. No waiting for a human. The protocol moves at the speed of the internet.</div>
+        </div>
+        <div class="about-val">
+          <div class="about-val-title">BORDERLESS BY DEFAULT</div>
+          <div class="about-val-text">Crypto payments work globally. A client in London can lock funds for a developer in Lagos in under 30 seconds. No currency friction. No wire fees.</div>
+        </div>
+        <div class="about-val">
+          <div class="about-val-title">BUILDERS PROTECTED</div>
+          <div class="about-val-text">We built this for the person doing the work. Dispute protection, freelancer rebuttal, AI arbitration — all designed to ensure skilled people get paid.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Team -->
+    <div style="margin-top:52px">
+      <div class="land-sec-label" style="margin-bottom:8px">The People</div>
+      <h2 style="font-family:var(--ff-head);font-size:1.6rem;letter-spacing:1px;margin-bottom:4px">WHO BUILT THIS</h2>
+      <div class="about-team-grid">
+        <div class="about-team-card">
+          <div class="about-team-av" style="background:var(--amber-dim);border-color:rgba(245,166,35,.3)">M</div>
+          <div class="about-team-name">Marshmallow</div>
+          <div class="about-team-role">Founder · Lead Engineer</div>
+          <div class="about-team-bio">Frontend-focused CS undergraduate, Lagos. Built Trustana from concept to MVP in 6 weeks. React, Node.js, Solana ecosystem builder. SuperteamNG member.</div>
+          <div class="about-team-links">
+            <a class="about-team-link" href="https://github.com/Orion-Marshmallow" target="_blank" rel="noopener">GitHub</a>
+            <a class="about-team-link" href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
+            <a class="about-team-link" href="https://linkedin.com" target="_blank" rel="noopener">Instagram</a>
+            <a class="about-team-link" href="https://linkedin.com" target="_blank" rel="noopener">Facebook</a>
+            <a class="about-team-link" href="https://linkedin.com" target="_blank" rel="noopener">X</a>
+          </div>
+        </div>
+        <div class="about-team-card">
+          <div class="about-team-av" style="background:var(--blue-dim);border-color:rgba(91,139,245,.3)">AI</div>
+          <div class="about-team-name">SmartVerify™ Engine</div>
+          <div class="about-team-role">Powered by Claude AI · Anthropic</div>
+          <div class="about-team-bio">The AI brain behind every delivery verification. Reads requirements, analyses submissions, and issues verdicts with itemised evidence. Zero bias. 24/7 availability.</div>
+          <div class="about-team-links">
+            <a class="about-team-link" href="https://anthropic.com" target="_blank" rel="noopener">Anthropic</a>
+          </div>
+        </div>
+        <div class="about-team-card">
+          <div class="about-team-av" style="background:rgba(45,212,160,.1);border-color:rgba(45,212,160,.3)">SN</div>
+          <div class="about-team-name">SuperteamNG</div>
+          <div class="about-team-role">Community · Ecosystem</div>
+          <div class="about-team-bio">Nigeria's most active Solana builder community. Trustana was built within and for the SuperteamNG ecosystem — part of the broader mission to build Africa on Solana.</div>
+          <div class="about-team-links">
+            <a class="about-team-link" href="https://superteam.fun" target="_blank" rel="noopener">superteam.fun</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="about-cta">
+      <h2>READY TO BUILD WITH US?</h2>
+      <p>Whether you're a freelancer tired of getting scammed, a client who wants payment protection, or a builder who wants to contribute — Trustana is for you.</p>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-a" style="padding:12px 28px" onclick="goTo('s-waitlist')"> Join Waitlist</button>
+        <button class="btn btn-g" style="padding:12px 22px" onclick="goToContact()"> Get in Touch</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="land-footer">
+    <div class="land-footer-inner">
+      <!-- Brand col -->
+      <div class="land-footer-brand">
+        <div style="font-family:var(--ff-head);font-size:1.4rem;letter-spacing:3px;color:var(--amber);margin-bottom:8px;display:flex;align-items:center;gap:8px">
+          <div style="width:20px;height:20px;background:var(--amber);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);filter:drop-shadow(0 2px 6px var(--amber-glow))"></div>
+          TRUSTANA
+        </div>
+        <div style="font-size:.78rem;color:var(--stone);line-height:1.65;max-width:260px;margin-bottom:16px">Nigeria's first AI-powered freelance escrow. Lock payments in Crypto or Fiat before work starts. SmartVerify™ AI checks every delivery.</div>
+        <div class="land-socials">
+          <a class="soc-btn" href="https://x.com/TRUSTANA_" target="_blank" rel="noopener" title="X (Twitter)">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <a class="soc-btn" href="https://www.instagram.com/trusana_official?igsh=MWN5aWJub2h2NzQ2ag==" target="_blank" rel="noopener" title="Instagram">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          </a>
+          <a class="soc-btn" href="https://linkedin.com/company/trustana" target="_blank" rel="noopener" title="LinkedIn">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </a>
+          <a class="soc-btn" href="https://facebook.com/trustana" target="_blank" rel="noopener" title="Facebook">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+        </div>
+      </div>
+
+
+      <!-- Product col -->
+      <div class="land-footer-col">
+        <h4>Product</h4>
+        <a onclick="goTo('s-waitlist')">Join Waitlist</a>
+        <a onclick="document.querySelector('.land-hiw').scrollIntoView({behavior:'smooth'})">How It Works</a>
+        <a onclick="document.querySelector('.land-features').scrollIntoView({behavior:'smooth'})">Features</a>
+        <a onclick="document.querySelector('.land-faq').scrollIntoView({behavior:'smooth'})">FAQ</a>
+      </div>
+
+
+      <!-- Payments col -->
+      <div class="land-footer-col">
+        <h4>Payments</h4>
+        <a>Crypto (Solana)</a>
+        <a>Fiat via Paystack</a>
+        <a>Milestone Payments</a>
+        <a>Auto-Release</a>
+        <a>Dispute Resolution</a>
+      </div>
+
+
+      <!-- Company col -->
+      <div class="land-footer-col">
+        <h4>Company</h4>
+        <a onclick="goToAbout()" style="cursor:pointer">About Trustana</a>
+        <a onclick="goToKwara()" style="cursor:pointer">Built in Kwara 🇳🇬</a>
+        <a onclick="openSuperteamModal()" style="cursor:pointer">SuperteamNG</a>
+        <a onclick="goToContact()" style="cursor:pointer">Contact Us</a>
+        <a style="color:var(--amber)">Terms of Service</a>
+        <a style="color:var(--amber)">Privacy Policy</a>
+      </div>
+    </div>
+
+    <!-- Footer bottom bar -->
+    <div class="land-footer-bottom">
+      <div style="font-size:.65rem;color:var(--stone)">
+        © 2026 Trustana. All rights reserved. · Built by the <strong style="color:var(--white)">Trustana Team</strong>, Kwara, Nigeria
+      </div>
+      <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;font-size:.68rem;color:var(--stone2)">
+        <span>✦ SmartVerify™ AI</span><span>⚡ Solana on-chain</span><span>🇳🇬 Nigeria-first</span><span> WhatsApp alerts</span>
+      </div>
+    </div>
+
+    <!-- Mobile fallback footer (hidden on large screens by .land-footer-inner) -->
+    <div class="land-footer-mobile-only">
+      <div style="font-family:var(--ff-head);font-size:1.1rem;letter-spacing:2px;color:var(--amber);margin-bottom:6px">TRUSTANA</div>
+      <div style="font-size:.72rem;color:var(--stone);margin-bottom:16px">Nigeria's first AI-powered freelance escrow · Crypto + Fiat</div>
+      <div class="land-socials">
+        <a class="soc-btn" href="https://x.com/TRUSTANA_" target="_blank" rel="noopener" title="X (Twitter)"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+        <a class="soc-btn" href="https://www.instagram.com/trusana_official?igsh=MWN5aWJub2h2NzQ2ag==" target="_blank" rel="noopener" title="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+        <a class="soc-btn" href="https://linkedin.com/company/trustana" target="_blank" rel="noopener" title="LinkedIn"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        <a class="soc-btn" href="https://facebook.com/trustana" target="_blank" rel="noopener" title="Facebook"><svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+      </div>
+      <div style="font-size:.65rem;color:var(--stone);border-top:1px solid var(--border);padding-top:14px;margin-top:12px">
+        Built by the <strong style="color:var(--white)">Trustana Team</strong> · Kwara, Nigeria<br>
+        <span style="opacity:.5">Powered by Claude AI · Solana · Paystack · Twilio</span>
+      </div>
+      <div style="margin-top:12px;font-size:.63rem;color:var(--stone);opacity:.6">© 2026 Trustana. All rights reserved.</div>
+    </div>
+  </div>
+</div>
+
+<!-- KWARA -->
+<div class="screen" id="s-kwara">
+  <canvas id="kwara-canvas"></canvas>
+  <nav class="land-nav" style="position:fixed;top:0;left:0;right:0;z-index:500">
+    <div class="land-logo" onclick="goTo('s-land')" style="cursor:pointer">
+      <div class="land-logo-mark"></div>TRUSTANA
+    </div>
+    <div class="land-nav-btns">
+      <button class="btn btn-ghost" style="padding:7px 14px;font-size:.76rem;background:none;border:none;color:var(--stone2);cursor:pointer" onclick="goToAbout()">About</button>
+      <button class="btn btn-ghost" style="padding:7px 14px;font-size:.76rem;background:none;border:none;color:var(--stone2);cursor:pointer" onclick="goToContact()">Contact</button>
+      <button class="btn btn-a" style="padding:7px 16px;font-size:.76rem" onclick="goTo('s-waitlist');setTimeout(()=>document.getElementById('wl-email')&&document.getElementById('wl-email').focus(),400)">Join Waitlist</button>
+    </div>
+    <button class="land-hamburger" id="kwara-hamburger" onclick="toggleKwaraMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+  <div class="land-mobile-menu" id="kwara-mobile-menu">
+    <button onclick="goTo('s-land');document.getElementById('kwara-mobile-menu').classList.remove('open');document.getElementById('kwara-hamburger').classList.remove('open')"> Home</button>
+    <button onclick="goToAbout();document.getElementById('kwara-mobile-menu').classList.remove('open');document.getElementById('kwara-hamburger').classList.remove('open')">About</button>
+    <button onclick="goToContact();document.getElementById('kwara-mobile-menu').classList.remove('open');document.getElementById('kwara-hamburger').classList.remove('open')">Contact</button>
+
+  </div>
+  <div style="height:60px;flex-shrink:0"></div>
+
+  <div class="kwara-wrap">
+    <div class="kwara-hero reveal">
+      <div class="land-sec-label" style="text-align:center;margin-bottom:12px">Where It Started</div>
+      <h1>BUILT IN KWARA <span style="color:var(--amber)">🇳🇬</span></h1>
+      <p>Trustana didn't start in Lagos or Silicon Valley — it started in Ilorin, Kwara State, Nigeria. A small team of builders, working remotely and in-person across Ilorin, decided that Nigerian freelancers deserved better payment protection. This is who made it happen.</p>
+    </div>
+
+    <div class="about-stats reveal reveal-delay-1" style="margin-top:28px">
+      <div class="about-stat-card">
+        <div class="about-stat-num">4</div>
+        <div class="about-stat-label">Core team members, all building remotely from Kwara</div>
+      </div>
+      <div class="about-stat-card">
+        <div class="about-stat-num">2026</div>
+        <div class="about-stat-label">Year Trustana was conceived and built</div>
+      </div>
+      <div class="about-stat-card">
+        <div class="about-stat-num">1</div>
+        <div class="about-stat-label">Shared mission: zero-scam freelancing for Nigeria</div>
+      </div>
+      <div class="about-stat-card">
+        <div class="about-stat-num">A</div>
+        <div class="about-stat-label">Dream: Protect freelancers and clients from scam </div>
+      </div>
+    </div>
+
+    <div style="margin-top:48px">
+      <div class="land-sec-label reveal" style="margin-bottom:8px">The Team</div>
+      <h2 class="reveal" style="font-family:var(--ff-head);font-size:1.6rem;letter-spacing:1px;margin-bottom:4px">THE PEOPLE OF KWARA</h2>
+      <div class="kwara-team-grid">
+        <div class="about-team-card reveal reveal-delay-1">
+          <div class="about-team-av" style="background:var(--amber-dim);border-color:rgba(245,166,35,.3)">M</div>
+          <div class="about-team-name">Marshmallow</div>
+          <div class="about-team-role">Founder &amp; Lead Dev</div>
+          <div class="about-team-bio">Started Trustana from scratch, owns the architecture end to end — frontend, backend, and the SmartVerify™ AI layer.</div>
+          <div class="about-team-links">
+            <a class="about-team-link" href="https://x.com/TRUSTANA_" target="_blank" rel="noopener">X</a>
+            <a class="about-team-link" href="https://facebook.com/trustana" target="_blank" rel="noopener">Facebook</a>
+            <a class="about-team-link" href="https://instagram.com/trustana" target="_blank" rel="noopener">Instagram</a>
+            <a class="about-team-link" href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
+          </div>
+        </div>
+        <div class="about-team-card reveal reveal-delay-2">
+          <div class="about-team-av" style="background:var(--blue-dim);border-color:rgba(91,139,245,.3)">B</div>
+          <div class="about-team-name">Backend Dev</div>
+          <div class="about-team-role">Backend Developer</div>
+          <div class="about-team-bio">Keeps the escrow logic, payment rails, and database infrastructure running fast and secure under the hood.</div>
+          <div class="about-team-links">
+            <a class="about-team-link" href="https://x.com/TRUSTANA_" target="_blank" rel="noopener">X</a>
+            <a class="about-team-link" href="https://facebook.com/trustana" target="_blank" rel="noopener">Facebook</a>
+            <a class="about-team-link" href="https://www.instagram.com/trusana_official?igsh=MWN5aWJub2h2NzQ2ag==" target="_blank" rel="noopener">Instagram</a>
+            <a class="about-team-link" href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
+          </div>
+        </div>
+        <div class="about-team-card reveal reveal-delay-3">
+          <div class="about-team-av" style="background:rgba(45,212,160,.1);border-color:rgba(45,212,160,.3)">C</div>
+          <div class="about-team-name">Content Creator</div>
+          <div class="about-team-role">Content Creator</div>
+          <div class="about-team-bio">Shapes how Trustana talks to Nigerian freelancers — copy, explainers, and the story behind the product.</div>
+          <div class="about-team-links">
+            <a class="about-team-link" href="https://x.com/TRUSTANA_" target="_blank" rel="noopener">X</a>
+            <a class="about-team-link" href="https://facebook.com/trustana" target="_blank" rel="noopener">Facebook</a>
+            <a class="about-team-link" href="https://www.instagram.com/trusana_official?igsh=MWN5aWJub2h2NzQ2ag==" target="_blank" rel="noopener">Instagram</a>
+            <a class="about-team-link" href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
+          </div>
+        </div>
+        <div class="about-team-card reveal reveal-delay-4">
+          <div class="about-team-av" style="background:var(--purple-dim);border-color:rgba(168,85,247,.3)">S</div>
+          <div class="about-team-name">Social &amp; Content Manager</div>
+          <div class="about-team-role">Social &amp; Content Manager</div>
+          <div class="about-team-bio">Runs the socials and community — getting the word out and keeping early users in the loop ahead of launch.</div>
+          <div class="about-team-links">
+            <a class="about-team-link" href="https://x.com/TRUSTANA_" target="_blank" rel="noopener">X</a>
+            <a class="about-team-link" href="https://facebook.com/trustana" target="_blank" rel="noopener">Facebook</a>
+            <a class="about-team-link" href="https://www.instagram.com/trusana_official?igsh=MWN5aWJub2h2NzQ2ag==" target="_blank" rel="noopener">Instagram</a>
+            <a class="about-team-link" href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-cta reveal" style="margin-top:48px">
+      <h2>WANT TO BUILD WITH US?</h2>
+      <p>We're a small team out of Kwara with big plans for Nigerian freelancers. Reach out, join the waitlist, or just say hi.</p>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-a" style="padding:12px 28px" onclick="goTo('s-waitlist')"> Join Waitlist</button>
+        <button class="btn btn-g" style="padding:12px 22px" onclick="goToContact()">Get in Touch</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="land-footer">
+    <div class="land-footer-inner">
+      <!-- Brand col -->
+      <div class="land-footer-brand">
+        <div style="font-family:var(--ff-head);font-size:1.4rem;letter-spacing:3px;color:var(--amber);margin-bottom:8px;display:flex;align-items:center;gap:8px">
+          <div style="width:20px;height:20px;background:var(--amber);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);filter:drop-shadow(0 2px 6px var(--amber-glow))"></div>
+          TRUSTANA
+        </div>
+        <div style="font-size:.78rem;color:var(--stone);line-height:1.65;max-width:260px;margin-bottom:16px">Nigeria's first AI-powered freelance escrow. Lock payments in Crypto or Fiat before work starts. SmartVerify™ AI checks every delivery.</div>
+        <div class="land-socials">
+          <a class="soc-btn" href="https://x.com/TRUSTANA_" target="_blank" rel="noopener" title="X (Twitter)">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <a class="soc-btn" href="https://www.instagram.com/trusana_official?igsh=MWN5aWJub2h2NzQ2ag==" target="_blank" rel="noopener" title="Instagram">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          </a>
+          <a class="soc-btn" href="https://linkedin.com/company/trustana" target="_blank" rel="noopener" title="LinkedIn">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </a>
+          <a class="soc-btn" href="https://facebook.com/trustana" target="_blank" rel="noopener" title="Facebook">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+        </div>
+      </div>
+
+
+      <!-- Product col -->
+      <div class="land-footer-col">
+        <h4>Product</h4>
+        <a onclick="goTo('s-waitlist')">Join Waitlist</a>
+        <a onclick="document.querySelector('.land-hiw').scrollIntoView({behavior:'smooth'})">How It Works</a>
+        <a onclick="document.querySelector('.land-features').scrollIntoView({behavior:'smooth'})">Features</a>
+        <a onclick="document.querySelector('.land-faq').scrollIntoView({behavior:'smooth'})">FAQ</a>
+      </div>
+
+
+      <!-- Payments col -->
+      <div class="land-footer-col">
+        <h4>Payments</h4>
+        <a>Crypto (Solana)</a>
+        <a>Fiat via Paystack</a>
+        <a>Milestone Payments</a>
+        <a>Auto-Release</a>
+        <a>Dispute Resolution</a>
+      </div>
+
+
+      <!-- Company col -->
+      <div class="land-footer-col">
+        <h4>Company</h4>
+        <a onclick="goToAbout()" style="cursor:pointer">About Trustana</a>
+        <a onclick="goToKwara()" style="cursor:pointer">Built in Kwara 🇳🇬</a>
+        <a onclick="openSuperteamModal()" style="cursor:pointer">SuperteamNG</a>
+        <a onclick="goToContact()" style="cursor:pointer">Contact Us</a>
+        <a style="color:var(--amber)">Terms of Service</a>
+        <a style="color:var(--amber)">Privacy Policy</a>
+      </div>
+    </div>
+
+    <!-- Footer bottom bar -->
+    <div class="land-footer-bottom">
+      <div style="font-size:.65rem;color:var(--stone)">
+        © 2026 Trustana. All rights reserved. · Built by the <strong style="color:var(--white)">Trustana Team</strong>, Kwara, Nigeria
+      </div>
+      <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;font-size:.68rem;color:var(--stone2)">
+        <span>✦ SmartVerify™ AI</span><span>⚡ Solana on-chain</span><span>🇳🇬 Nigeria-first</span><span> WhatsApp alerts</span>
+      </div>
+    </div>
+
+    <!-- Mobile fallback footer (hidden on large screens by .land-footer-inner) -->
+    <div class="land-footer-mobile-only">
+      <div style="font-family:var(--ff-head);font-size:1.1rem;letter-spacing:2px;color:var(--amber);margin-bottom:6px">TRUSTANA</div>
+      <div style="font-size:.72rem;color:var(--stone);margin-bottom:16px">Nigeria's first AI-powered freelance escrow · Crypto + Fiat</div>
+      <div class="land-socials">
+        <a class="soc-btn" href="https://x.com/TRUSTANA_" target="_blank" rel="noopener" title="X (Twitter)"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+        <a class="soc-btn" href="https://www.instagram.com/trusana_official?igsh=MWN5aWJub2h2NzQ2ag==" target="_blank" rel="noopener" title="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+        <a class="soc-btn" href="https://linkedin.com/company/trustana" target="_blank" rel="noopener" title="LinkedIn"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        <a class="soc-btn" href="https://facebook.com/trustana" target="_blank" rel="noopener" title="Facebook"><svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+      </div>
+      <div style="font-size:.65rem;color:var(--stone);border-top:1px solid var(--border);padding-top:14px;margin-top:12px">
+        Built by the <strong style="color:var(--white)">Trustana Team</strong> · Kwara, Nigeria<br>
+        <span style="opacity:.5">Powered by Claude AI · Solana · Paystack · Twilio</span>
+      </div>
+      <div style="margin-top:12px;font-size:.63rem;color:var(--stone);opacity:.6">© 2026 Trustana. All rights reserved.</div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<div class="screen" id="s-contact">
+  <canvas id="contact-canvas"></canvas>
+  <nav class="land-nav" style="position:fixed;top:0;left:0;right:0;z-index:500">
+    <div class="land-logo" onclick="goTo('s-land')" style="cursor:pointer">
+      <div class="land-logo-mark"></div>TRUSTANA
+    </div>
+    <div class="land-nav-btns">
+      <button class="btn btn-ghost" style="padding:7px 14px;font-size:.76rem;background:none;border:none;color:var(--stone2);cursor:pointer" onclick="goToAbout()">About</button>
+      <button class="btn btn-ghost" style="padding:7px 14px;font-size:.76rem;background:none;border:none;color:var(--amber);cursor:pointer;font-weight:600" onclick="goToContact()">Contact</button>
+      <button class="btn btn-a" style="padding:7px 16px;font-size:.76rem" onclick="goTo('s-waitlist');setTimeout(()=>document.getElementById('wl-email')&&document.getElementById('wl-email').focus(),400)">Join Waitlist</button>
+    </div>
+    <button class="land-hamburger" id="contact-hamburger" onclick="toggleContactMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+  <div class="land-mobile-menu" id="contact-mobile-menu">
+    <button onclick="goTo('s-land');document.getElementById('contact-mobile-menu').classList.remove('open');document.getElementById('contact-hamburger').classList.remove('open')"> Home</button>
+    <button onclick="goToAbout();document.getElementById('contact-mobile-menu').classList.remove('open');document.getElementById('contact-hamburger').classList.remove('open')">About</button>
+    <button onclick="goToContact();document.getElementById('contact-mobile-menu').classList.remove('open');document.getElementById('contact-hamburger').classList.remove('open')" style="color:var(--amber);border-color:rgba(245,166,35,.25)">Contact</button>
+    <button class="mmenu-waitlist" onclick="goTo('s-waitlist');setTimeout(()=>document.getElementById('wl-email')&&document.getElementById('wl-email').focus(),400);document.getElementById('contact-mobile-menu').classList.remove('open');document.getElementById('contact-hamburger').classList.remove('open')">✦ Join Waitlist</button>
+  </div>
+  <div style="height:60px;flex-shrink:0"></div>
+
+  <div class="contact-wrap">
+
+    <!-- Hero -->
+    <div class="contact-hero">
+      <div class="land-sec-label" style="text-align:center;margin-bottom:10px">Get In Touch</div>
+      <h1 class="contact-h1">LET'S TALK.</h1>
+      <p class="contact-sub">Questions about Trustana? Partnership inquiry? Press? Technical support? We're a small team and we actually read every message. Based in Lagos — fast response times.</p>
+    </div>
+
+    <!-- Main grid -->
+    <div class="contact-grid">
+
+      <!-- Left: Contact info cards -->
+      <div class="contact-info-col">
+
+        <!-- Email cards -->
+        <div class="contact-card">
+          <div class="contact-card-icon" style="background:var(--amber-dim);border-color:rgba(245,166,35,.2)">📧</div>
+          <div class="contact-card-body">
+            <div class="contact-card-label">General Inquiries</div>
+            <a class="contact-card-val" href="mailto:remilekunoreoluwa@gmail.com">remilekunoreoluwa@gmail.com</a>
+            <div class="contact-card-sub">Partnerships, press, general questions</div>
+          </div>
+        </div>
+
+        <div class="contact-card">
+          <div class="contact-card-icon" style="background:var(--blue-dim);border-color:rgba(91,139,245,.2)">🛠</div>
+          <div class="contact-card-body">
+            <div class="contact-card-label">Technical Support</div>
+            <a class="contact-card-val" href="mailto:officialtrustana@gmail.com">officialtrustana@gmail.com</a>
+            <div class="contact-card-sub">Payment issues, escrow problems, bugs</div>
+          </div>
+        </div>
+
+        <div class="contact-card">
+          <div class="contact-card-icon" style="background:var(--purple-dim);border-color:rgba(168,85,247,.2)">🤝</div>
+          <div class="contact-card-body">
+            <div class="contact-card-label">Partnerships & Business</div>
+            <a class="contact-card-val" href="mailto:trustanaofficial@gmail.com">trustanaofficial@gmail.com</a>
+            <div class="contact-card-sub">API access, agency deals, integrations</div>
+          </div>
+        </div>
+
+        <div class="contact-card">
+          <div class="contact-card-icon" style="background:var(--wa-dim);border-color:rgba(37,211,102,.2)">📱</div>
+          <div class="contact-card-body">
+            <div class="contact-card-label">WhatsApp (Faster)</div>
+            <a class="contact-card-val" href="https://wa.me/+234 811 159 2981" target="_blank" rel="noopener">+234 811 159 2981</a>
+            <div class="contact-card-sub">Mon–Sun · 9am–9pm WAT · Usually replies in under 2 hours</div>
+          </div>
+        </div>
+
+        <div class="contact-card">
+          <div class="contact-card-icon" style="background:var(--naira-dim);border-color:rgba(0,182,155,.2)">📞</div>
+          <div class="contact-card-body">
+            <div class="contact-card-label">Phone (Nigeria)</div>
+            <a class="contact-card-val" href="tel:+2348105615467">+234 810 561 5467</a>
+            <div class="contact-card-sub">Business hours only · Kwara, Nigeria (WAT, UTC+1)</div>
+          </div>
+        </div>
+
+        <!-- Location -->
+        <div class="contact-card" style="border-color:rgba(245,166,35,.15)">
+          <div class="contact-card-icon" style="background:var(--amber-dim);border-color:rgba(245,166,35,.2)">📍</div>
+          <div class="contact-card-body">
+            <div class="contact-card-label">Office</div>
+            <div class="contact-card-val" style="color:var(--white)">Kwara, Nigeria 🇳🇬</div>
+            <div class="contact-card-sub">Ilorin Tanke · Open to in-person meetings by appointment</div>
+          </div>
+        </div>
+
+        <!-- Socials -->
+        <div class="contact-socials-block">
+          <div class="contact-socials-label">Follow & Connect</div>
+          <div class="contact-socials-row">
+            <a class="contact-soc" href="https://x.com/TRUSTANA_" target="_blank" rel="noopener" title="X / Twitter">
+              <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <span>@trustana</span>
+            </a>
+            <a class="contact-soc" href="https://www.instagram.com/trusana_official?igsh=MWN5aWJub2h2NzQ2ag==" target="_blank" rel="noopener" title="Instagram">
+              <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+              <span>@trustana</span>
+            </a>
+            <a class="contact-soc" href="https://www.linkedin.com/in/trustana-undefined-144568418?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" rel="noopener" title="LinkedIn">
+              <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              <span>Trustana</span>
+            </a>
+            <a class="contact-soc" href="https://www.facebook.com/share/1HGESbo7Kx/" target="_blank" rel="noopener" title="Facebook">
+              <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              <span>Trustana</span>
+            </a>
+            <a class="contact-soc" href="https://wa.me/2348111592981" target="_blank" rel="noopener" title="WhatsApp">
+              <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              <span>WhatsApp</span>
+            </a>
+            
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right: Contact form -->
+      <div class="contact-form-col">
+        <div class="contact-form-card">
+          <h2 class="contact-form-h">Send Us a Message</h2>
+          <p class="contact-form-sub">We'll get back to you within 24 hours on business days. For urgent escrow issues, WhatsApp is faster.</p>
+
+          <div id="contact-success" style="display:none;background:var(--green-dim);border:1px solid rgba(45,212,160,.25);border-radius:var(--r);padding:18px;text-align:center;margin-bottom:16px">
+            <div style="font-size:1.6rem;margin-bottom:6px">✅</div>
+            <div style="font-weight:600;color:var(--green);margin-bottom:4px">Message sent!</div>
+            <div style="font-size:.76rem;color:var(--stone2)">We'll reply to your email within 24 hours.</div>
+          </div>
+
+          <div id="contact-form-inner">
+            <div class="cf-row">
+              <div class="afield"><label>First Name *</label><input type="text" id="cf-fn" placeholder="Chidera"/></div>
+              <div class="afield"><label>Last Name *</label><input type="text" id="cf-ln" placeholder="Okafor"/></div>
+            </div>
+            <div class="afield"><label>Email Address *</label><input type="email" id="cf-em" placeholder="chidera@example.com"/></div>
+            <div class="afield"><label>Phone / WhatsApp</label><input type="tel" id="cf-ph" placeholder="+234 801 234 5678"/></div>
+            <div class="afield">
+              <label>Subject *</label>
+              <select id="cf-subj">
+                <option value="">Select a subject…</option>
+                <option value="general">General Inquiry</option>
+                <option value="support">Technical Support</option>
+                <option value="dispute">Dispute / Payment Issue</option>
+                <option value="partnership">Partnership / Business</option>
+                <option value="press">Press / Media</option>
+                <option value="feature">Feature Request</option>
+                <option value="bug">Bug Report</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="afield"><label>Message *</label><textarea id="cf-msg" rows="5" placeholder="Tell us how we can help…" style="resize:vertical"></textarea></div>
+            <div id="cf-err" style="display:none;background:var(--red-dim);border:1px solid rgba(255,90,90,.2);border-radius:var(--r2);padding:9px 12px;font-size:.76rem;color:var(--red);margin-bottom:10px"></div>
+            <button class="btn btn-a" style="width:100%;justify-content:center;padding:13px" onclick="submitContactForm()">
+              <span id="cf-btn-text">Send Message →</span>
+            </button>
+            <div style="margin-top:10px;font-size:.68rem;color:var(--stone);text-align:center">Or email us directly at <a href="mailto:trustanaofficial@gmail.com" style="color:var(--amber)">trustanaofficial@gmail.com</a></div>
+          </div>
+        </div>
+
+        <!-- Response time card -->
+        <div class="contact-response-card">
+          <div class="contact-response-row">
+            <div>
+              <div class="contact-response-label">WhatsApp</div>
+              <div class="contact-response-time" style="color:var(--green)">Under 2 hours</div>
+            </div>
+          </div>
+          <div class="contact-response-row">
+            <div>
+              <div class="contact-response-label">Email</div>
+              <div class="contact-response-time">Within 24 hours</div>
+            </div>
+          </div>
+          <div class="contact-response-row">
+            <div>
+              <div class="contact-response-label">Urgent Escrow Issues</div>
+              <div class="contact-response-time" style="color:var(--amber)">Priority · same business day</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Bottom CTA strip -->
+    <div class="contact-cta-strip">
+      <div style="font-family:var(--ff-head);font-size:1.1rem;letter-spacing:1.5px;color:var(--white);margin-bottom:6px">READY TO STOP GETTING SCAMMED?</div>
+      <div style="font-size:.78rem;color:var(--stone2);margin-bottom:16px">Join hundreds of Nigerian freelancers already using Trustana.</div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-a" style="padding:11px 26px" onclick="goTo('s-waitlist')">Join the Waitlist</button>
+        <button class="btn btn-g" style="padding:11px 20px" onclick="goTo('s-land')">← Back to Home</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- HOME -->
+<div class="screen" id="s-waitlist">
+  <canvas id="wl-canvas"></canvas>
+
+  <!-- Stationary Nav -->
+  <nav class="land-nav">
+    <div class="land-logo" onclick="goTo('s-land')" style="cursor:pointer">
+      <div class="land-logo-mark"></div>TRUSTANA
+    </div>
+    <div class="land-nav-btns">
+      <button class="btn btn-ghost" style="padding:7px 14px;font-size:.76rem;background:none;border:none;color:var(--stone2);cursor:pointer" onclick="goToAbout()">About</button>
+      <button class="btn btn-ghost" style="padding:7px 14px;font-size:.76rem;background:none;border:none;color:var(--stone2);cursor:pointer" onclick="goToContact()">Contact</button>
+      <button class="btn btn-ghost" style="padding:7px 14px;font-size:.76rem;background:none;border:none;color:var(--amber);cursor:pointer;font-weight:600" onclick="goTo('s-waitlist')"> Waitlist</button>
+    </div>
+    <button class="land-hamburger" id="wl-hamburger" onclick="toggleWlMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+  <div class="land-mobile-menu" id="wl-mobile-menu">
+    <button onclick="goTo('s-land');closeWlMenu()">Home</button>
+    <button onclick="goToAbout();closeWlMenu()">About</button>
+    <button onclick="goToContact();closeWlMenu()">Contact</button>
+    <button onclick="goTo('s-waitlist');closeWlMenu()">Join the Waitlist</button>
+  </div>
+
+  <!-- Left panel — large screens only -->
+  <div class="wl-main">
+  <div class="wl-left-panel">
+    <div class="wl-panel-headline reveal reveal-left">STOP WORKING<br>ON <span>TRUST.</span><br>BUILD ON IT.</div>
+    <p class="wl-panel-sub reveal reveal-left reveal-delay-1">Nigeria's first AI-powered freelance escrow is launching soon. Lock client funds in Crypto or Fiat before you write a single line of code. SmartVerify™ AI checks every delivery.</p>
+    <div class="wl-panel-stats reveal reveal-left reveal-delay-2">
+      <div class="wl-stat-item"><span class="wl-stat-val">1 in 3</span><span class="wl-stat-lbl">Freelancers scammed</span></div>
+      <div class="wl-stat-item"><span class="wl-stat-val">₦0</span><span class="wl-stat-lbl">Cost to join</span></div>
+      <div class="wl-stat-item"><span class="wl-stat-val">2x</span><span class="wl-stat-lbl">Payment rails</span></div>
+    </div>
+    <div class="wl-feature-rows reveal reveal-left reveal-delay-3">
+      <div class="wl-feature-row">
+        <div class="wl-feature-row-text"><strong>Escrow Before Work Starts</strong><span>Client funds lock before you lift a finger. No fund, no work.</span></div>
+      </div>
+      <div class="wl-feature-row">
+        <div class="wl-feature-row-text"><strong>SmartVerify™ AI Review</strong><span>Claude AI scores each requirement — pass, partial, or fail — before release.</span></div>
+      </div>
+      <div class="wl-feature-row">
+        <div class="wl-feature-row-text"><strong>Crypto + Fiat Payments</strong><span>Crypto via Phantom for global. Fiat via Paystack for local. Nigeria's only dual rail.</span></div>
+      </div>
+      <div class="wl-feature-row">
+        <div class="wl-feature-row-text"><strong>Auto-Release Protection</strong><span>Funds auto-release 12 hours after delivery if the client ghosts. You get paid.</span></div>
+      </div>
+    </div>
+    <div class="wl-panel-trust reveal reveal-left reveal-delay-4">
+      <span>🇳🇬 Nigeria-first</span><span>·</span>
+      <span>Built in Kwara</span><span>·</span>
+      <span>Early access spots are limited</span>
+    </div>
+  </div>
+
+  <!-- Right panel wrapper -->
+  <div class="wl-right-panel">
+  <div class="wl-shell">
+
+    <!-- Logo -->
+    <div class="wl-logo" onclick="goTo('s-land')" style="cursor:pointer">
+      <div class="wl-logo-mark"></div>
+      <span class="wl-logo-name">TRUSTANA</span>
+    </div>
+
+    <!-- Hero -->
+    <div class="wl-hero">
+      <div style="display:flex;justify-content:center;margin-bottom:18px">
+        <div class="wl-badge"><span class="wl-badge-dot"></span>Early Access · Limited Spots</div>
+      </div>
+      <h1 class="wl-headline">GET PAID.<br><span>NO SCAMS.</span><br>GUARANTEED.</h1>
+      <p class="wl-sub">Nigeria's first AI-powered freelance escrow is launching soon. Lock client funds before you write a single line of code. SmartVerify™ checks every delivery.</p>
+      <div class="wl-pills">
+        <div class="wl-pill"><span></span><span>Escrow-protected payments</span></div>
+        <div class="wl-pill"><span></span><span>SmartVerify™ AI</span></div>
+        <div class="wl-pill"><span></span><span>Crypto + Fiat</span></div>
+        <div class="wl-pill"><span></span><span>Built for Nigeria</span></div>
+        <div class="wl-pill"><span></span><span>Soon to expand to Africa </span></div>
+      </div>
+    </div>
+
+    <!-- Form card -->
+    <div class="wl-card">
+      <!-- Default form view -->
+      <div id="wl-form-wrap">
+        <div class="wl-card-hd">
+          <h3>JOIN THE WAITLIST</h3>
+          <p>Be among the first to secure your payments on Trustana.</p>
+        </div>
+        <div class="wl-form">
+          <div class="wl-err" id="wl-err"></div>
+          <div class="wl-row">
+            <div class="wl-field">
+              <label>First Name</label>
+              <input type="text" id="wl-fname" placeholder="Chidera" maxlength="40"/>
+            </div>
+            <div class="wl-field">
+              <label>Last Name</label>
+              <input type="text" id="wl-lname" placeholder="Okafor" maxlength="40"/>
+            </div>
+          </div>
+          <div class="wl-field">
+            <label>Email Address</label>
+            <input type="email" id="wl-email" placeholder="you@example.com" maxlength="100"/>
+          </div>
+          <div class="wl-row">
+            <div class="wl-field">
+              <label>I am a</label>
+              <select id="wl-role">
+                <option value="">Select role…</option>
+                <option value="freelancer">Freelancer</option>
+                <option value="client">Client</option>
+                <option value="both">Both</option>
+                <option value="agency">Agency</option>
+              </select>
+            </div>
+            <div class="wl-field">
+              <label>Country</label>
+              <select id="wl-country">
+                <option value="">Select country…</option>
+                <option value="NG" selected>🇳🇬 Nigeria</option>
+                <option value="DIASPORA">✈️ Nigerian Diaspora</option>
+                <option value="OTHER">🌍 Other</option>
+              </select>
+            </div>
+          </div>
+          <button class="wl-submit" id="wl-btn" onclick="submitWaitlist()">
+            <span></span><span>SECURE MY SPOT</span>
+          </button>
+          <div style="text-align:center;font-size:.68rem;color:var(--stone);margin-top:2px">No spam. Unsubscribe anytime. We'll only contact you about launch.</div>
+        </div>
+      </div>
+      <!-- Success view -->
+      <div class="wl-success" id="wl-success">
+        <div class="wl-success-ico">🎉</div>
+        <div class="wl-success-title">YOU'RE IN!</div>
+        <p class="wl-success-msg">Welcome to the Trustana early access list. We'll notify you the moment we go live — before anyone else.</p>
+        <div class="wl-success-tag" id="wl-success-name">✦ SPOT SECURED</div>
+        <div class="wl-count-strip">
+          <span style="color:var(--stone2)">Waitlist members</span>
+          <span class="wl-count-num" id="wl-member-count">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="wl-footer" style="margin-top:16px">
+      
+    </div>
+  </div>
+  </div><!-- /wl-right-panel -->
+  </div><!-- /wl-main -->
+
+  <!-- Footer -->
+  <div class="land-footer">
+    <div class="land-footer-inner">
+      <!-- Brand col -->
+      <div class="land-footer-brand">
+        <div style="font-family:var(--ff-head);font-size:1.4rem;letter-spacing:3px;color:var(--amber);margin-bottom:8px;display:flex;align-items:center;gap:8px">
+          <div style="width:20px;height:20px;background:var(--amber);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);filter:drop-shadow(0 2px 6px var(--amber-glow))"></div>
+          TRUSTANA
+        </div>
+        <div style="font-size:.78rem;color:var(--stone);line-height:1.65;max-width:260px;margin-bottom:16px">Nigeria's first AI-powered freelance escrow. Lock payments in Crypto or Fiat before work starts. SmartVerify™ AI checks every delivery.</div>
+        <div class="land-socials">
+          <a class="soc-btn" href="https://x.com/TRUSTANA_" target="_blank" rel="noopener" title="X (Twitter)">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <a class="soc-btn" href="https://www.instagram.com/trusana_official?igsh=MWN5aWJub2h2NzQ2ag==" target="_blank" rel="noopener" title="Instagram">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          </a>
+          <a class="soc-btn" href="https://www.linkedin.com/in/trustana-undefined-144568418?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" rel="noopener" title="LinkedIn">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </a>
+          <a class="soc-btn" href="https://www.facebook.com/share/1HGESbo7Kx/" target="_blank" rel="noopener" title="Facebook">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+        </div>
+      </div>
+
+
+      <!-- Product col -->
+      <div class="land-footer-col">
+        <h4>Product</h4>
+        <a onclick="goTo('s-waitlist')">Join Waitlist</a>
+        <a onclick="goTo('s-land');setTimeout(()=>document.querySelector('.land-hiw')&&document.querySelector('.land-hiw').scrollIntoView({behavior:'smooth'}),400)">How It Works</a>
+        <a onclick="goTo('s-land');setTimeout(()=>document.querySelector('.land-features')&&document.querySelector('.land-features').scrollIntoView({behavior:'smooth'}),400)">Features</a>
+        <a onclick="goTo('s-land');setTimeout(()=>document.querySelector('.land-faq')&&document.querySelector('.land-faq').scrollIntoView({behavior:'smooth'}),400)">FAQ</a>
+      </div>
+
+
+      <!-- Payments col -->
+      <div class="land-footer-col">
+        <h4>Payments</h4>
+        <a>Crypto (Solana)</a>
+        <a>Fiat via Paystack</a>
+        <a>Milestone Payments</a>
+        <a>Auto-Release</a>
+        <a>Dispute Resolution</a>
+      </div>
+
+
+      <!-- Company col -->
+      <div class="land-footer-col">
+        <h4>Company</h4>
+        <a onclick="goToAbout()" style="cursor:pointer">About Trustana</a>
+        <a onclick="goToKwara()" style="cursor:pointer">Built in Kwara 🇳🇬</a>
+        <a onclick="openSuperteamModal()" style="cursor:pointer">SuperteamNG</a>
+        <a onclick="goToContact()" style="cursor:pointer">Contact Us</a>
+        <a style="color:var(--amber)">Terms of Service</a>
+        <a style="color:var(--amber)">Privacy Policy</a>
+      </div>
+    </div>
+
+    <!-- Footer bottom bar -->
+    <div class="land-footer-bottom">
+      <div style="font-size:.65rem;color:var(--stone)">
+        © 2026 Trustana. All rights reserved. · Built by the <strong style="color:var(--white)">Trustana Team</strong>, Kwara, Nigeria
+      </div>
+      <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;font-size:.68rem;color:var(--stone2)">
+        <span>✦ SmartVerify™ AI</span><span>⚡ Solana on-chain</span><span>🇳🇬 Nigeria-first</span><span> WhatsApp alerts</span>
+      </div>
+    </div>
+
+    <!-- Mobile fallback footer (hidden on large screens by .land-footer-inner) -->
+    <div class="land-footer-mobile-only">
+      <div style="font-family:var(--ff-head);font-size:1.1rem;letter-spacing:2px;color:var(--amber);margin-bottom:6px">TRUSTANA</div>
+      <div style="font-size:.72rem;color:var(--stone);margin-bottom:16px">Nigeria's first AI-powered freelance escrow · Crypto + Fiat</div>
+      <div class="land-socials">
+        <a class="soc-btn" href="https://x.com/TRUSTANA_" target="_blank" rel="noopener" title="X (Twitter)"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+        <a class="soc-btn" href="https://www.instagram.com/trusana_official?igsh=MWN5aWJub2h2NzQ2ag==" target="_blank" rel="noopener" title="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+        <a class="soc-btn" href="https://www.linkedin.com/in/trustana-undefined-144568418?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" rel="noopener" title="LinkedIn"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        <a class="soc-btn" href="https://www.facebook.com/share/1HGESbo7Kx/" target="_blank" rel="noopener" title="Facebook"><svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+      </div>
+      <div style="font-size:.65rem;color:var(--stone);border-top:1px solid var(--border);padding-top:14px;margin-top:12px">
+        Built by the <strong style="color:var(--white)">Trustana Team</strong> · Kwara, Nigeria<br>
+        <span style="opacity:.5">Powered by AI · Solana · Paystack </span>
+      </div>
+      <div style="margin-top:12px;font-size:.63rem;color:var(--stone);opacity:.6">© 2026 Trustana. All rights reserved.</div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast">✓ <span id="tmsg">Done</span></div>
+
+
+<script src="main.js"></script>
+</body>
+</html>
