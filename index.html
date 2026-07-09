@@ -205,7 +205,54 @@ window._fbUnsubscribe = null;
       </div>
 
       <!-- Right: escrow simulation -->
-     
+      <div class="land-hero-right reveal reveal-right reveal-delay-4" style="transition-duration:.75s">
+        <div class="esc-sim" id="escSimLand">
+          <div class="esc-card" id="escCardLand"><div class="esc-scan"></div>
+            <div class="esc-card-top">
+              <div class="esc-card-label">ESCROW VAULT</div>
+              <div class="esc-ai-badge" id="escAiBadgeLand">
+                <span class="esc-ai-dot"></span>AI Verified
+              </div>
+            </div>
+            <div class="esc-amount-row">
+              <span class="esc-currency">₦</span>
+              <span class="esc-amount" id="escAmountLand">0</span>
+            </div>
+            <div class="esc-status-row">
+              <span class="esc-status-dot" id="escStatusDotLand"></span>
+              <span class="esc-status" id="escStatusLand">Ready to lock</span>
+            </div>
+            <div class="esc-subtext" id="escSubtextLand">SmartVerify™ · Auto-release · Dispute proof</div>
+            <div class="esc-success-check" id="escCheckLand">✓</div>
+          </div>
+          <div class="esc-flow" id="escFlowLand">
+            <div class="esc-flow-node">
+              <div class="esc-node-icon">👤</div>
+              <div class="esc-node-label">Client</div>
+            </div>
+            <div class="esc-flow-track">
+              <div class="esc-flow-line"></div>
+              <div class="esc-flow-dot" id="escFlowDotLand"></div>
+            </div>
+            <div class="esc-flow-node esc-vault-node">
+              <div class="esc-node-icon">🔐</div>
+              <div class="esc-node-label">Escrow</div>
+            </div>
+            <div class="esc-flow-track">
+              <div class="esc-flow-line"></div>
+              <div class="esc-flow-dot" id="escFlowDot2Land"></div>
+            </div>
+            <div class="esc-flow-node">
+              <div class="esc-node-icon">💻</div>
+              <div class="esc-node-label">Dev</div>
+            </div>
+          </div>
+          <button class="esc-btn" id="escBtnLand" onclick="runEscrowSimLand()">
+            <span class="esc-btn-icon"></span>
+            <span class="esc-btn-text" id="escBtnTextLand">Start Transaction</span>
+          </button>
+        </div>
+      </div>
     </div>
 
   </div>
