@@ -167,6 +167,14 @@ function submitWaitlist(){
     :Promise.resolve(false);
 
   saveRemote.catch(()=>{}).finally(()=>{
+    // Send confirmation email via EmailJS
+    if(window.emailjs){
+      emailjs.send('service_19elfmk','template_femg6mp',{
+        to_email:email,
+        first_name:fname
+      }).catch(err=>console.warn('EmailJS send failed:',err));
+    }
+
     // Show success
     document.getElementById('wl-form-wrap').style.display='none';
     const succ=document.getElementById('wl-success');
@@ -390,15 +398,16 @@ initLandCanvas();
     });
   }
   // Single belt-and-suspenders pass, given generously after the normal
-  // IntersectionObserver should have already handled it.
-  setTimeout(forceReveal, 1200);
-  window.addEventListener('load', function(){ setTimeout(forceReveal,1200); });
+  // IntersectionObserver should have already handled it. Delay kept long
+  // so it only catches genuinely broken environments, not normal scrolling.
+  setTimeout(forceReveal, 8000);
+  window.addEventListener('load', function(){ setTimeout(forceReveal,8000); });
 
   // Re-arm the fallback every time the active screen changes
   window._showRaw = (function(_orig){
     return function(id){
       _orig(id);
-      setTimeout(forceReveal, 1200);
+      setTimeout(forceReveal, 8000);
     };
   })(window._showRaw||function(){});
 })();
